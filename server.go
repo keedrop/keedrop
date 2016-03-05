@@ -6,6 +6,8 @@ import (
   "github.com/mediocregopher/radix.v2/pool"
   "github.com/op/go-logging"
   "net/http"
+  "strings"
+//  "encoding/base64"
   "errors"
 )
 
@@ -28,19 +30,24 @@ func storeSecret(redis *pool.Pool, data *secretData) error {
   }
   defer redis.Put(conn)
 
-  keyName := data.PubKey + data.Nonce
-  logger.Debug("Writing key", keyName)
+  keyName := redisKey(data.PubKey, data.Nonce)
   if _, err := conn.Cmd("SET", keyName, data.Secret, "NX", "EX", 60*60*24).Str(); err != nil {
     return errors.New("Could not store value")
   }
   return nil
 }
 
+func redisKey(pubKey string, nonce string) string {
+  // TODO: check pubKey and nonce for plausible length and base64 encoding
+  return pubKey + nonce
+}
+
 // retrieves the secret from Redis, deleting it at the same time
-func retrieveSecret(redis *pool.Pool, pubKeyNonce string) (string, error) {
-  if len(pubKeyNonce) != (pubKeyLen + nonceLen) {
-    return "", errors.New("Invalid key length")
-  }
+func retrieveSecret(redis *pool.Pool, pubKey string, nonce string) (string, error) {
+  // decoded, err := base64.StdEncoding.DecodeString(pubKey)
+  // if len(pubKeyNonce) != (pubKeyLen + nonceLen) {
+  //   return "", errors.New("Invalid key length")
+  // }
 
   conn, err := redis.Get()
   if err != nil {
@@ -48,12 +55,17 @@ func retrieveSecret(redis *pool.Pool, pubKeyNonce string) (string, error) {
   }
   defer redis.Put(conn)
 
-  logger.Debug("Reading key", pubKeyNonce)
-  if secret, err := conn.Cmd("GET", pubKeyNonce).Str(); err != nil {
+  key := redisKey(pubKey, nonce)
+  logger.Debug("Reading from Redis key ", key)
+  if key == "" {
+    return "", errors.New("Invalid PubKey/Nonce data")
+  }
+
+  if secret, err := conn.Cmd("GET", key).Str(); err != nil {
     logger.Error("Could not read secret: ", err)
     return "", errors.New("No such secret")
   } else {
-    if _, delErr := conn.Cmd("DEL", pubKeyNonce).Str(); delErr != nil {
+    if _, delErr := conn.Cmd("DEL", key).Str(); delErr != nil {
       // https://github.com/mediocregopher/radix.v2/issues/23
       if delErr.Error() != "wrong type" {
         logger.Error("Could not delete secret: ", err)
@@ -84,13 +96,28 @@ func storePass(redis *pool.Pool, ctx *gin.Context) {
   }
 }
 
+func splitKeyNonce(str string) (string, string) {
+  arr := strings.Split(str, "_")
+  if len(arr) != 2 {
+    logger.Error("Invalid keynonce: ", str)
+    return "", ""
+  }
+  return arr[0], arr[1]
+}
+
 // Gin handler to retrieve (and delete) a secret
 func retrievePass(redis *pool.Pool, ctx *gin.Context) {
-  keyNonce := ctx.Param("keynonce")
-  if secret, err := retrieveSecret(redis, keyNonce); err != nil {
+  pubKey, nonce := splitKeyNonce(ctx.Param("keynonce"))
+  if pubKey == "" {
+    ctx.JSON(http.StatusBadRequest, gin.H{"error": "Don't know how to interpret data"})
+    return
+  }
+  logger.Debug("Reading data for pubkey and nonce: ", pubKey, nonce)
+  if secret, err := retrieveSecret(redis, pubKey, nonce); err != nil {
     if err.Error() == "No such secret" {
       ctx.JSON(http.StatusNotFound, gin.H{"error": "No such secret"})
     } else {
+      logger.Error("Error reading secret", err)
       ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Could not read secret"})
     }
   } else {
@@ -116,5 +143,11 @@ func main() {
 
   router.POST("/api/store", wrapHandler(redis, storePass))
   router.GET("/api/retrieve/:keynonce", wrapHandler(redis, retrievePass))
+  router.StaticFile("/", "./store.html")
+  router.StaticFile("/r", "./retrieve.html")
+  router.StaticFile("/nacl.js", "./nacl.min.js")
+  router.StaticFile("/nacl-util.js", "./nacl-util.min.js")
+  router.StaticFile("/keedrop.js", "./keedrop.js")
+  router.StaticFile("/styles.css", "./styles.css")
   router.Run()
 }
