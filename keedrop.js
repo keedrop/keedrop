@@ -1,6 +1,14 @@
+function transferEncode(value) {
+  return nacl.util.encodeBase64(value).replace(/\//g, "!")
+}
+
+function transferDecode(value) {
+  return nacl.util.decodeBase64(value.replace(/!/g, "/"))
+}
+
 function onStoreXhrLoadEnd(keyPair, nonce, resultBox, evt) {
   if (evt.target.status == 204) {
-    var decodeLink = location.protocol + "//" + location.host + "/r#" + nacl.util.encodeBase64(keyPair.publicKey) + "_" + nacl.util.encodeBase64(nonce) + "_" + nacl.util.encodeBase64(keyPair.secretKey);
+    var decodeLink = location.protocol + "//" + location.host + "/r#" + transferEncode(keyPair.publicKey) + "_" + transferEncode(nonce) + "_" + transferEncode(keyPair.secretKey);
     resultBox.innerHTML = "Send this link to the intended recipient: " + decodeLink;
   } else {
     // handle error
@@ -18,9 +26,9 @@ function onEncryptClicked(secretInput, resultBox) {
   req.setRequestHeader("Content-Type", "application/json");
   req.addEventListener("loadend", onStoreXhrLoadEnd.bind(document, keyPair, nonce, resultBox))
   req.send(JSON.stringify({
-    pubkey: nacl.util.encodeBase64(keyPair.publicKey),
-    nonce: nacl.util.encodeBase64(nonce),
-    secret: nacl.util.encodeBase64(encrypted)
+    pubkey: transferEncode(keyPair.publicKey),
+    nonce: transferEncode(nonce),
+    secret: transferEncode(encrypted)
   }));
 }
 
@@ -30,10 +38,10 @@ function onReceiveXhrLoadEnd(pubKey, nonce, secretKey, resultBox, event) {
     return;
   }
   var data = JSON.parse(event.target.responseText);
-  var decodedSecret = nacl.util.decodeBase64(data.secret);
-  var decodedPubKey = nacl.util.decodeBase64(pubKey);
-  var decodedNonce = nacl.util.decodeBase64(nonce);
-  var decodedSecKey = nacl.util.decodeBase64(secretKey);
+  var decodedSecret = transferDecode(data.secret);
+  var decodedPubKey = transferDecode(pubKey);
+  var decodedNonce = transferDecode(nonce);
+  var decodedSecKey = transferDecode(secretKey);
   var plainText = nacl.box.open(decodedSecret, decodedNonce, decodedPubKey, decodedSecKey);
   if (plainText == false) {
     alert("Could not decrypt the data");

@@ -44,34 +44,35 @@ func redisKey(pubKey string, nonce string) string {
 
 // retrieves the secret from Redis, deleting it at the same time
 func retrieveSecret(redis *pool.Pool, pubKey string, nonce string) (string, error) {
-  // decoded, err := base64.StdEncoding.DecodeString(pubKey)
-  // if len(pubKeyNonce) != (pubKeyLen + nonceLen) {
-  //   return "", errors.New("Invalid key length")
-  // }
-
   conn, err := redis.Get()
   if err != nil {
-    return "", errors.New("Redis connection pool exhausted")
+    return "", errors.New("Could not connect to Redis")
   }
   defer redis.Put(conn)
 
   key := redisKey(pubKey, nonce)
-  logger.Debug("Reading from Redis key ", key)
+  logger.Info("Reading from Redis key ", key)
   if key == "" {
     return "", errors.New("Invalid PubKey/Nonce data")
   }
 
-  if secret, err := conn.Cmd("GET", key).Str(); err != nil {
-    logger.Error("Could not read secret: ", err)
-    return "", errors.New("No such secret")
-  } else {
-    if _, delErr := conn.Cmd("DEL", key).Str(); delErr != nil {
-      // https://github.com/mediocregopher/radix.v2/issues/23
-      if delErr.Error() != "wrong type" {
-        logger.Error("Could not delete secret: ", err)
-      }
+  conn.PipeAppend("MULTI")
+  conn.PipeAppend("GET", key)
+  conn.PipeAppend("DEL", key)
+  conn.PipeAppend("EXEC")
+
+  for i := 0; i < 3; i++ {
+    if err := conn.PipeResp().Err; err != nil {
+      logger.Error("Redis error:", err)
+      return "", errors.New("Redis communication failed")
     }
+  }
+  if results, err := conn.PipeResp().Array(); err == nil {
+    secret, _ := results[0].Str()
     return secret, nil
+  } else {
+    logger.Error("Error executing batch:", err)
+    return "", errors.New("Redis communication failed")
   }
 }
 
@@ -112,7 +113,7 @@ func retrievePass(redis *pool.Pool, ctx *gin.Context) {
     ctx.JSON(http.StatusBadRequest, gin.H{"error": "Don't know how to interpret data"})
     return
   }
-  logger.Debug("Reading data for pubkey and nonce: ", pubKey, nonce)
+  logger.Info("Reading data for pubkey and nonce: ", pubKey, nonce)
   if secret, err := retrieveSecret(redis, pubKey, nonce); err != nil {
     if err.Error() == "No such secret" {
       ctx.JSON(http.StatusNotFound, gin.H{"error": "No such secret"})
@@ -138,7 +139,6 @@ func main() {
   if err != nil {
     logger.Fatal("Cannot connect to Redis")
   }
-
   router := gin.Default()
 
   router.POST("/api/store", wrapHandler(redis, storePass))
