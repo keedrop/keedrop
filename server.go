@@ -7,15 +7,17 @@ import (
 	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
 	"github.com/mediocregopher/radix.v2/pool"
+	"github.com/mediocregopher/radix.v2/redis"
 	"github.com/op/go-logging"
 	"net/http"
 )
 
 const (
-	listenPort      = ":8080"
-	mnemoLen        = 10
-	defaultLifetime = 60 * 60 * 24
+	listenPort        = ":8080"
+	mnemoLen          = 10
+	defaultLifetime   = 60 * 60 * 24
 	maxMnemoFindTries = 10
+	secretCounterKey  = "KeeDropKeyCounter"
 )
 
 var logger = logging.MustGetLogger("keedrop")
@@ -26,6 +28,12 @@ type secretData struct {
 	PubKey string `json:"pubkey" binding:"required"`
 	Nonce  string `json:"nonce" binding:"required"`
 	Secret string `json:"secret" binding:"required"`
+}
+
+func increaseSecretCounter(redis *redis.Client) {
+	if _, err := redis.Cmd("INCR", secretCounterKey).Int64(); err != nil {
+		logger.Error("Could not increase secret count", err)
+	}
 }
 
 // stores the secret in Redis and returns the key(mnemo) where it can be found
@@ -45,6 +53,7 @@ func saveInRedis(redis *pool.Pool, data *secretData) (string, bool) {
 	for i := 0; i < maxMnemoFindTries; i++ {
 		mnemo := uniuri.NewLen(mnemoLen)
 		if _, err := conn.Cmd("SET", mnemo, jsonData, "NX", "EX", defaultLifetime).Str(); err == nil {
+			increaseSecretCounter(conn)
 			return mnemo, true
 		} else {
 			logger.Error("Could not write secret, probably key collision.", err)
@@ -144,7 +153,7 @@ func main() {
 
 	router.POST("/api/secret", wrapHandler(redis, storeSecret))
 	router.GET("/api/secret/:mnemo", wrapHandler(redis, retrieveSecret))
-  router.Static("/assets", "./assets")
+	router.Static("/assets", "./assets")
 	router.StaticFile("/r", "./retrieve.html")
 	router.StaticFile("/", "./store.html")
 	endless.ListenAndServe(listenPort, router)
