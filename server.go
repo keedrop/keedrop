@@ -24,6 +24,7 @@ var logger = logging.MustGetLogger("keedrop")
 
 // structure to store the secret in Redis
 // only the secret key remains with the sender
+// secret for test.json: Lz5DP4grKMN9efoL9dt!S81X7AFGhin3OHDgbB8qcqQ=
 type secretData struct {
 	PubKey string `json:"pubkey" binding:"required"`
 	Nonce  string `json:"nonce" binding:"required"`
