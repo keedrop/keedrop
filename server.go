@@ -4,6 +4,7 @@ package main
 import (
 	"encoding/json"
 	"github.com/dchest/uniuri"
+	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
 	"github.com/mediocregopher/radix.v2/pool"
 	"github.com/op/go-logging"
@@ -11,9 +12,10 @@ import (
 )
 
 const (
+	listenPort      = ":8080"
 	mnemoLen        = 10
 	defaultLifetime = 60 * 60 * 24
-	maxKeyFindTries = 10
+	maxMnemoFindTries = 10
 )
 
 var logger = logging.MustGetLogger("keedrop")
@@ -26,7 +28,7 @@ type secretData struct {
 	Secret string `json:"secret" binding:"required"`
 }
 
-// stores the secret in Redis and returns the key where it can be found
+// stores the secret in Redis and returns the key(mnemo) where it can be found
 func saveInRedis(redis *pool.Pool, data *secretData) (string, bool) {
 	conn, err := redis.Get()
 	if err != nil {
@@ -40,20 +42,20 @@ func saveInRedis(redis *pool.Pool, data *secretData) (string, bool) {
 		logger.Error("Could not marshal secret to JSON.", jsonErr)
 		return "", false
 	}
-	for i := 0; i < maxKeyFindTries; i++ {
-		keyName := uniuri.NewLen(mnemoLen)
-		if _, err := conn.Cmd("SET", keyName, jsonData, "NX", "EX", defaultLifetime).Str(); err == nil {
-			return keyName, true
+	for i := 0; i < maxMnemoFindTries; i++ {
+		mnemo := uniuri.NewLen(mnemoLen)
+		if _, err := conn.Cmd("SET", mnemo, jsonData, "NX", "EX", defaultLifetime).Str(); err == nil {
+			return mnemo, true
 		} else {
 			logger.Error("Could not write secret, probably key collision.", err)
 		}
 	}
-	logger.Error("Could not find key after", maxKeyFindTries, "tries")
+	logger.Error("Could not find unused mnemo after", maxMnemoFindTries, "tries")
 	return "", false
 }
 
 // retrieves the secret from Redis, deleting it at the same time
-func loadFromRedis(redis *pool.Pool, key string) (*secretData, bool) {
+func loadFromRedis(redis *pool.Pool, mnemo string) (*secretData, bool) {
 	conn, err := redis.Get()
 	if err != nil {
 		logger.Error("Could not connect to Redis.", err)
@@ -62,8 +64,8 @@ func loadFromRedis(redis *pool.Pool, key string) (*secretData, bool) {
 	defer redis.Put(conn)
 
 	conn.PipeAppend("MULTI")
-	conn.PipeAppend("GET", key)
-	conn.PipeAppend("DEL", key)
+	conn.PipeAppend("GET", mnemo)
+	conn.PipeAppend("DEL", mnemo)
 	conn.PipeAppend("EXEC")
 
 	// the first 3 commands should only contain "OK" and "QUEUED", no real data
@@ -76,7 +78,7 @@ func loadFromRedis(redis *pool.Pool, key string) (*secretData, bool) {
 	if results, err := conn.PipeResp().Array(); err == nil {
 		// array contains the results after MULTI in order
 		encodedData, _ := results[0].Bytes()
-		if len(encodedData) == 0 { // it means the key wasn't found
+		if len(encodedData) == 0 { // it means the secret wasn't found
 			return nil, true
 		} else {
 			secret := new(secretData)
@@ -100,8 +102,8 @@ type redisUsingGinHandler func(*pool.Pool, *gin.Context)
 func storeSecret(redis *pool.Pool, ctx *gin.Context) {
 	var secret secretData
 	if ctx.BindJSON(&secret) == nil {
-		if keyName, ok := saveInRedis(redis, &secret); ok {
-			ctx.JSON(http.StatusOK, gin.H{"key": keyName})
+		if mnemo, ok := saveInRedis(redis, &secret); ok {
+			ctx.JSON(http.StatusOK, gin.H{"mnemo": mnemo})
 		} else {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Could not store secret"})
 		}
@@ -142,11 +144,8 @@ func main() {
 
 	router.POST("/api/secret", wrapHandler(redis, storeSecret))
 	router.GET("/api/secret/:mnemo", wrapHandler(redis, retrieveSecret))
-	router.StaticFile("/", "./store.html")
+  router.Static("/assets", "./assets")
 	router.StaticFile("/r", "./retrieve.html")
-	router.StaticFile("/nacl.js", "./nacl.min.js")
-	router.StaticFile("/nacl-util.js", "./nacl-util.min.js")
-	router.StaticFile("/keedrop.js", "./keedrop.js")
-	router.StaticFile("/styles.css", "./styles.css")
-	router.Run()
+	router.StaticFile("/", "./store.html")
+	endless.ListenAndServe(listenPort, router)
 }
