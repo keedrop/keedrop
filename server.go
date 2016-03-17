@@ -13,11 +13,12 @@ import (
 )
 
 const (
-	listenPort        = ":8080"
-	mnemoLen          = 10
-	defaultLifetime   = 60 * 60 * 24
-	maxMnemoFindTries = 10
-	secretCounterKey  = "KeeDropKeyCounter"
+	listenPort              = ":8080"
+	mnemoLen                = 10
+	defaultLifetime         = 60 * 60 * 24
+	maxMnemoFindTries       = 10
+	secretsStoredCounter    = "KeeDropStoredKeysCounter"
+	secretsRetrievedCounter = "KeeDropRetrievedKeysCounter"
 )
 
 var logger = logging.MustGetLogger("keedrop")
@@ -31,9 +32,9 @@ type secretData struct {
 	Secret string `json:"secret" binding:"required"`
 }
 
-func increaseSecretCounter(redis *redis.Client) {
-	if _, err := redis.Cmd("INCR", secretCounterKey).Int64(); err != nil {
-		logger.Error("Could not increase secret count", err)
+func increaseCounter(redis *redis.Client, counterName string) {
+	if _, err := redis.Cmd("INCR", counterName).Int64(); err != nil {
+		logger.Error("Could not increase counter", err)
 	}
 }
 
@@ -54,7 +55,7 @@ func saveInRedis(redis *pool.Pool, data *secretData) (string, bool) {
 	for i := 0; i < maxMnemoFindTries; i++ {
 		mnemo := uniuri.NewLen(mnemoLen)
 		if _, err := conn.Cmd("SET", mnemo, jsonData, "NX", "EX", defaultLifetime).Str(); err == nil {
-			increaseSecretCounter(conn)
+			increaseCounter(conn, secretsStoredCounter)
 			return mnemo, true
 		} else {
 			logger.Error("Could not write secret, probably key collision.", err)
@@ -93,6 +94,7 @@ func loadFromRedis(redis *pool.Pool, mnemo string) (*secretData, bool) {
 		} else {
 			secret := new(secretData)
 			if err := json.Unmarshal(encodedData, secret); err == nil {
+				increaseCounter(conn, secretsRetrievedCounter)
 				return secret, true
 			} else {
 				logger.Error("Could not unmarshal JSON data: ", encodedData)
