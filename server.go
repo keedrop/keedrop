@@ -10,10 +10,10 @@ import (
 	"github.com/mediocregopher/radix.v2/redis"
 	"github.com/op/go-logging"
 	"net/http"
+	"os"
 )
 
 const (
-	listenPort              = ":8080"
 	mnemoLen                = 10
 	defaultLifetime         = 60 * 60 * 24
 	maxMnemoFindTries       = 10
@@ -146,11 +146,28 @@ func wrapHandler(redis *pool.Pool, wrapped redisUsingGinHandler) gin.HandlerFunc
 	}
 }
 
+func redisConnectionString() string {
+	if connectionString := os.Getenv("KEEDROP_REDIS"); len(connectionString) > 0 {
+		return connectionString
+	} else {
+		return "localhost:6379"
+	}
+}
+
+func listenPort() string {
+	if listenPort := os.Getenv("KEEDROP_PORT"); len(listenPort) > 0 {
+		return listenPort
+	} else {
+		return ":8080"
+	}
+}
+
 // application entry point
 func main() {
-	redis, err := pool.New("tcp", "localhost:6379", 10)
+	redisUri := redisConnectionString()
+	redis, err := pool.New("tcp", redisUri, 10)
 	if err != nil {
-		logger.Fatal("Cannot connect to Redis")
+		logger.Fatal("Cannot connect to Redis on", redisUri)
 	}
 	router := gin.Default()
 
@@ -159,5 +176,5 @@ func main() {
 	router.Static("/assets", "./assets")
 	router.StaticFile("/r", "./retrieve.html")
 	router.StaticFile("/", "./store.html")
-	endless.ListenAndServe(listenPort, router)
+	endless.ListenAndServe(listenPort(), router)
 }
