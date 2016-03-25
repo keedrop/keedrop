@@ -174,6 +174,7 @@ func main() {
 	router.POST("/api/secret", wrapHandler(redis, storeSecret))
 	router.GET("/api/secret/:mnemo", wrapHandler(redis, retrieveSecret))
 	router.Static("/assets", "./assets")
+	router.StaticFile("/imprint", "./imprint.html")
 	router.StaticFile("/r", "./retrieve.html")
 	router.StaticFile("/", "./store.html")
 	endless.ListenAndServe(listenPort(), router)

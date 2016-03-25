@@ -12,7 +12,8 @@ function onStoreXhrLoadEnd(secretKey, resultBox, evt) {
   if (evt.target.status == 200) {
     var data = JSON.parse(evt.target.responseText);
     var decodeLink = location.protocol + "//" + location.host + "/r#" + data.mnemo + "_" + transferEncode(secretKey);
-    resultBox.innerHTML = "Send this link to the intended recipient: " + decodeLink;
+    resultBox.value = decodeLink;
+    resultBox.parentNode.parentNode.classList.add("reveal");
   } else {
     // handle error
   }
@@ -50,7 +51,8 @@ function onReceiveXhrLoadEnd(secretKey, resultBox, evt) {
     alert("Could not decrypt the data");
   } else {
     var stringValue = nacl.util.encodeUTF8(plainText);
-    resultBox.innerHTML = "Here is your password: " + stringValue;
+    resultBox.value = stringValue;
+    resultBox.parentNode.parentNode.classList.add("reveal");
   }
 }
 

@@ -4,11 +4,35 @@
     <script src="/assets/nacl.min.js"></script>
     <script src="/assets/nacl-util.min.js"></script>
     <script src="/assets/keedrop.js"></script>
+    <link href="/assets/milligram.min.css" rel="stylesheet" type="text/css">
     <link href="/assets/styles.css" rel="stylesheet" type="text/css">
   </head>
   <body>
-    <button id="decrypt">Receive your password</button>
-    <div id="resultBox">
+    <div class="container store">
+      <div class="row">
+        <div class="column tagline">
+          <h2>Someone sent you a password</h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="column content">
+          <p>Remember, each password can be retrieved only once</p>
+          <button id="decrypt">Retrieve now</button>
+        </div>
+      </div>
+      <div class="row secret-link">
+        <div class="column">
+          <div>
+            Here you are:
+          </div>
+          <input id="resultBox" type="text" readonly="readonly"/>
+        </div>
+      </div>
+      <div class="row footer">
+        <div class="column">
+          <a href="/imprint">Impressum</a>
+        </div>
+      </div>
     </div>
   </body>
 </html>
