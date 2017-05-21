@@ -10,10 +10,10 @@ with key verification.
 ## Security features
 
 - State-of-the-art encryption technology: Curve25519-XSalsa20-Poly1305, courtesy of [TweetNaCl](http://tweetnacl.js.org/).
-- The server never even saves anything on disk
+- The server never sees the unencrypted secret
 - Data is automatically expunged after 24h
-- All data is deleted once it has been retrieved
-- We don't track you with analytics
+- Alternatively, data is deleted on retrieval
+- Doesn't track you with analytics
 
 ## What it cannot defend against:
 
