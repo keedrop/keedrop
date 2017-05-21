@@ -19,6 +19,23 @@ function onStoreXhrLoadEnd(secretKey, resultBox, evt) {
   }
 }
 
+var ERRORS = {
+  "keyDecodeFail": "Could not interpret your key. Check that the link you clicked is complete.",
+  "noSecretId": "It looks like someone tampered with your link.",
+  "secretNotFound": "Could not retrieve secret. It has either expired (24h) or someone else already retrieved it.",
+  "decryptionFailed": "Oops. Could not decrypt the data."
+}
+
+function showError(messageId, hideContent) {
+  var errorDiv = document.querySelector(".error");
+  errorDiv.innerHTML = ERRORS[messageId];
+  errorDiv.classList.add("reveal");
+  if (hideContent) {
+    var content = document.querySelector(".content");
+    content.classList.add("hide");
+  }
+}
+
 function onEncryptClicked(secretInput, resultBox) {
   var secret = nacl.util.decodeUTF8(secretInput.value);
   var keyPair = nacl.box.keyPair();
@@ -36,19 +53,18 @@ function onEncryptClicked(secretInput, resultBox) {
   }));
 }
 
-function onReceiveXhrLoadEnd(secretKey, resultBox, evt) {
+function onReceiveXhrLoadEnd(decodedSecKey, resultBox, evt) {
   if (evt.target.status == 404) {
-    alert("No such key. It has either expired or someone else already retrieved it.");
+    showError("secretNotFound");
     return;
   }
   var data = JSON.parse(evt.target.responseText);
   var decodedSecret = transferDecode(data.secret);
   var decodedPubKey = transferDecode(data.pubkey);
   var decodedNonce = transferDecode(data.nonce);
-  var decodedSecKey = transferDecode(secretKey);
   var plainText = nacl.box.open(decodedSecret, decodedNonce, decodedPubKey, decodedSecKey);
   if (plainText == false) {
-    alert("Could not decrypt the data");
+    showError("decryptionFailed");
   } else {
     var stringValue = nacl.util.encodeUTF8(plainText);
     resultBox.value = stringValue;
@@ -58,18 +74,26 @@ function onReceiveXhrLoadEnd(secretKey, resultBox, evt) {
 
 function onDecryptClicked(resultBox) {
   if (location.hash.indexOf("_") == -1) {
-    alert("Oops, that didn't work");
+    showError("noSecretdId");
     return;
   }
   var components = location.hash.substr(1).split("_");
   var mnemo = components[0];
   var secretKey = components[1];
 
-  var req = new XMLHttpRequest();
-  req.open("GET", "/api/secret/" + mnemo);
-  req.setRequestHeader("Accept", "application/json");
-  req.addEventListener("loadend", onReceiveXhrLoadEnd.bind(document, secretKey, resultBox))
-  req.send();
+  try {
+    let decodedSecretKey = transferDecode(secretKey)
+    if (decodedSecretKey.length != 32) {
+      throw new Error("Key length mismatch");
+    }
+    var req = new XMLHttpRequest();
+    req.open("GET", "/api/secret/" + mnemo);
+    req.setRequestHeader("Accept", "application/json");
+    req.addEventListener("loadend", onReceiveXhrLoadEnd.bind(document, decodedSecretKey, resultBox))
+    req.send();
+  } catch(e) {
+    showError("keyDecodeFail", true);
+  }
 }
 
 function initReadPage() {
