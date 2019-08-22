@@ -63,13 +63,13 @@ function onReceiveXhrLoadEnd(decodedSecKey, resultBox, evt) {
   var decodedPubKey = transferDecode(data.pubkey);
   var decodedNonce = transferDecode(data.nonce);
   var plainText = nacl.box.open(decodedSecret, decodedNonce, decodedPubKey, decodedSecKey);
-  if (plainText == false) {
-    showError("decryptionFailed");
-  } else {
+  if (plainText) {
     var stringValue = nacl.util.encodeUTF8(plainText);
     resultBox.value = stringValue;
     resultBox.parentNode.parentNode.classList.add("reveal");
-  }
+  } else {
+    showError("decryptionFailed");
+  } 
 }
 
 function onDecryptClicked(resultBox) {
