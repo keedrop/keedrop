@@ -6,8 +6,7 @@ import (
 	"github.com/dchest/uniuri"
 	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
-	"github.com/mediocregopher/radix.v2/pool"
-	"github.com/mediocregopher/radix.v2/redis"
+	"github.com/mediocregopher/radix/v3"
 	"github.com/op/go-logging"
 	"net/http"
 	"os"
@@ -32,21 +31,14 @@ type secretData struct {
 	Secret string `json:"secret" binding:"required"`
 }
 
-func increaseCounter(redis *redis.Client, counterName string) {
-	if _, err := redis.Cmd("INCR", counterName).Int64(); err != nil {
+func increaseCounter(redis *radix.Pool, counterName string) {
+	if err := (*redis).Do(radix.Cmd(nil, "INCR", counterName)); err != nil {
 		logger.Error("Could not increase counter", err)
 	}
 }
 
 // stores the secret in Redis and returns the key(mnemo) where it can be found
-func saveInRedis(redis *pool.Pool, data *secretData) (string, bool) {
-	conn, err := redis.Get()
-	if err != nil {
-		logger.Error("Could not connect to Redis")
-		return "", false
-	}
-	defer redis.Put(conn)
-
+func saveInRedis(redis *radix.Pool, data *secretData) (string, bool) {
 	jsonData, jsonErr := json.Marshal(data)
 	if jsonErr != nil {
 		logger.Error("Could not marshal secret to JSON.", jsonErr)
@@ -54,8 +46,8 @@ func saveInRedis(redis *pool.Pool, data *secretData) (string, bool) {
 	}
 	for i := 0; i < maxMnemoFindTries; i++ {
 		mnemo := uniuri.NewLen(mnemoLen)
-		if _, err := conn.Cmd("SET", mnemo, jsonData, "NX", "EX", defaultLifetime).Str(); err == nil {
-			increaseCounter(conn, secretsStoredCounter)
+		if err := (*redis).Do(radix.FlatCmd(nil, "SET", mnemo, jsonData, "NX", "EX", defaultLifetime)); err == nil {
+			increaseCounter(redis, secretsStoredCounter)
 			return mnemo, true
 		} else {
 			logger.Error("Could not write secret, probably key collision.", err)
@@ -66,52 +58,58 @@ func saveInRedis(redis *pool.Pool, data *secretData) (string, bool) {
 }
 
 // retrieves the secret from Redis, deleting it at the same time
-func loadFromRedis(redis *pool.Pool, mnemo string) (*secretData, bool) {
-	conn, err := redis.Get()
-	if err != nil {
-		logger.Error("Could not connect to Redis.", err)
+func loadFromRedis(redis *radix.Pool, mnemo string) (*secretData, bool) {
+
+	var encodedData string
+
+	if err := (*redis).Do(radix.WithConn(mnemo, func(conn radix.Conn) error {
+		if err := conn.Do(radix.Cmd(nil, "MULTI")); err != nil {
+			return err
+		}
+
+		var err error
+		defer func() {
+			if err != nil {
+				conn.Do(radix.Cmd(nil, "DISCARD"))
+			}
+		}()
+
+		if err = conn.Do(radix.Cmd(nil, "GET", mnemo)); err != nil {
+			return err
+		}
+		if err = conn.Do(radix.Cmd(nil, "DEL", mnemo)); err != nil {
+			return err
+		}
+		var result []string
+		if err = conn.Do(radix.Cmd(&result, "EXEC")); err != nil {
+			return err
+		}
+		encodedData = result[0]
+		return nil
+	})); err != nil {
+		logger.Error("Failed to execute command batch")
 		return nil, false
 	}
-	defer redis.Put(conn)
 
-	conn.PipeAppend("MULTI")
-	conn.PipeAppend("GET", mnemo)
-	conn.PipeAppend("DEL", mnemo)
-	conn.PipeAppend("EXEC")
-
-	// the first 3 commands should only contain "OK" and "QUEUED", no real data
-	for i := 0; i < 3; i++ {
-		if err := conn.PipeResp().Err; err != nil {
-			logger.Error("Redis error.", err)
+	if len(encodedData) == 0 { // it means the secret wasn't found
+		return nil, true
+	} else {
+		secret := new(secretData)
+		if err := json.Unmarshal([]byte(encodedData), secret); err == nil {
+			increaseCounter(redis, secretsRetrievedCounter)
+			return secret, true
+		} else {
+			logger.Error("Could not unmarshal JSON data: ", encodedData)
 			return nil, false
 		}
-	}
-	if results, err := conn.PipeResp().Array(); err == nil {
-		// array contains the results after MULTI in order
-		encodedData, _ := results[0].Bytes()
-		if len(encodedData) == 0 { // it means the secret wasn't found
-			return nil, true
-		} else {
-			secret := new(secretData)
-			if err := json.Unmarshal(encodedData, secret); err == nil {
-				increaseCounter(conn, secretsRetrievedCounter)
-				return secret, true
-			} else {
-				logger.Error("Could not unmarshal JSON data: ", encodedData)
-				return nil, false
-			}
-		}
-	} else {
-		logger.Error("Error executing batch.", err)
-		return nil, false
 	}
 }
 
 // the Gin handlers all want a Redis connection, too
-type redisUsingGinHandler func(*pool.Pool, *gin.Context)
+type redisUsingGinHandler func(*radix.Pool, *gin.Context)
 
 // POST /api/secret
-func storeSecret(redis *pool.Pool, ctx *gin.Context) {
+func storeSecret(redis *radix.Pool, ctx *gin.Context) {
 	var secret secretData
 	if ctx.BindJSON(&secret) == nil {
 		if mnemo, ok := saveInRedis(redis, &secret); ok {
@@ -125,7 +123,7 @@ func storeSecret(redis *pool.Pool, ctx *gin.Context) {
 }
 
 // GET /api/secret/:mnemo
-func retrieveSecret(redis *pool.Pool, ctx *gin.Context) {
+func retrieveSecret(redis *radix.Pool, ctx *gin.Context) {
 	mnemo := ctx.Param("mnemo")
 	logger.Debug("Reading data for mnemo:", mnemo)
 	if secret, ok := loadFromRedis(redis, mnemo); !ok {
@@ -140,7 +138,7 @@ func retrieveSecret(redis *pool.Pool, ctx *gin.Context) {
 }
 
 // ensures that the Gin handler function receives a Redis connection, too
-func wrapHandler(redis *pool.Pool, wrapped redisUsingGinHandler) gin.HandlerFunc {
+func wrapHandler(redis *radix.Pool, wrapped redisUsingGinHandler) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		wrapped(redis, ctx)
 	}
@@ -150,7 +148,7 @@ func redisConnectionString() string {
 	if connectionString := os.Getenv("KEEDROP_REDIS"); len(connectionString) > 0 {
 		return connectionString
 	} else {
-		return "localhost:6379"
+		return "redis://localhost:6379/0"
 	}
 }
 
@@ -165,7 +163,7 @@ func listenPort() string {
 // application entry point
 func main() {
 	redisUri := redisConnectionString()
-	redis, err := pool.New("tcp", redisUri, 10)
+	redis, err := radix.NewPool("tcp", redisUri, 10)
 	if err != nil {
 		logger.Fatal("Cannot connect to Redis on", redisUri)
 	}
