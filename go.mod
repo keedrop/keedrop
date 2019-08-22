@@ -8,4 +8,5 @@ require (
 	github.com/gin-gonic/gin v1.4.0
 	github.com/mediocregopher/radix/v3 v3.3.2
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
+	github.com/stretchr/testify v1.3.0
 )

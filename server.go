@@ -160,13 +160,7 @@ func listenPort() string {
 	}
 }
 
-// application entry point
-func main() {
-	redisUri := redisConnectionString()
-	redis, err := radix.NewPool("tcp", redisUri, 10)
-	if err != nil {
-		logger.Fatal("Cannot connect to Redis on", redisUri)
-	}
+func setupRouter(redis *radix.Pool) *gin.Engine {
 	router := gin.Default()
 
 	router.POST("/api/secret", wrapHandler(redis, storeSecret))
@@ -175,5 +169,16 @@ func main() {
 	router.StaticFile("/imprint", "./imprint.html")
 	router.StaticFile("/r", "./retrieve.html")
 	router.StaticFile("/", "./store.html")
+	return router
+}
+
+// application entry point
+func main() {
+	redisUri := redisConnectionString()
+	redis, err := radix.NewPool("tcp", redisUri, 10)
+	if err != nil {
+		logger.Fatal("Cannot connect to Redis on", redisUri)
+	}
+	router := setupRouter(redis)
 	endless.ListenAndServe(listenPort(), router)
 }
