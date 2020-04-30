@@ -1,0 +1,25 @@
+{
+  "name": "keedrop",
+  "version": "1.0.0",
+  "description": "secure secret dump",
+  "main": "keedrop.js",
+  "scripts": {
+    "lint": "eslint assets/keedrop.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@git.evopark.de:5555/marcus/keedrop.git"
+  },
+  "keywords": [
+    "secure",
+    "online",
+    "service"
+  ],
+  "author": "Marcus Ilgner",
+  "license": "MIT",
+  "devDependencies": {
+    "@linthtml/linthtml": "^0.3.2",
+    "eslint": "^2.13.1"
+  }
+}
