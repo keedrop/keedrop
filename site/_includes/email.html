@@ -1,0 +1,13 @@
+{%- if include.hidden -%}
+  {%- assign parts = include.email | split: "@" -%}
+  {%- assign name = parts[0] %}
+  {%- assign domainTld = parts[1] | split: "." -%}
+  <a class="email" href="#"
+    data-name="{{name}}"
+    data-domain="{{domainTld[0]}}"
+    data-tld="{{domainTld[1]}}"
+    rel="noreferrer noopener">
+  </a>
+{%- else -%}
+  <a class="email" href="mailto:{{include.email}}"rel="noreferrer noopener">{{include.text | default: include.email}}</a>
+{%- endif -%}

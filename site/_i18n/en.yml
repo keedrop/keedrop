@@ -1,0 +1,12 @@
+errors:
+  enableJavaScriptButton: Please enable JavaScript
+headers:
+  home: Transfer Secrets Securely
+  imprint: KeeDrop
+  decrypt: Someone sent you a secret
+titles:
+  home: Home
+  imprint: Imprint
+  decrypt: Decrypt
+encrypt: Encrypt
+decrypt: Decrypt

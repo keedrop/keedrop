@@ -1,0 +1,27 @@
+---
+layout: default
+header: headers.decrypt
+title: titles.decrypt
+scripts: true
+---
+<noscript>
+  <div class="row error reveal">The password is decrypted locally and for that you need to enable JavaScript.</div>
+</noscript>
+<div class="row error animate-show">
+</div>
+<div class="row content">
+  <div class="column">
+    <p>Remember, each password can be retrieved only once</p>
+    {% capture text %}{% t decrypt %}{% endcapture %}
+    {% include submitButton.html id="decrypt" text=text %}
+  </div>
+</div>
+<div class="row secret-link animate-show">
+  <div class="column">
+    <form>
+      <div>Here you are:</div>
+      <input id="resultBox" type="text" readonly/><button id="copy">Copy</button>
+      <div class="returnToCopy">(Press RETURN to copy to clipboard)</div>
+    </form>
+  </div>
+</div>

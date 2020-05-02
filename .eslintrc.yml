@@ -1,6 +1,14 @@
 env:
   browser: true
-extends: 'eslint:recommended'
+  mocha: true
+  cypress/globals: true
+parserOptions:
+  ecmaVersion: 2015
+extends:
+  - eslint:recommended
+  - plugin:cypress/recommended
+plugins:
+  - cypress
 rules:
   indent:
     - error

@@ -1,0 +1,10 @@
+headers:
+  home: Передача секретов безопасно
+  imprint: KeeDrop
+  decrypt: Someone sent you a password
+titles:
+  home: кодировать
+  imprint: импрессум
+  decrypt: декодировать
+encrypt: кодировать
+decrypt: декодировать

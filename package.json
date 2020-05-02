@@ -5,13 +5,15 @@
   "main": "keedrop.js",
   "scripts": {
     "lint": "eslint assets/keedrop.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run cypress",
+    "test:dev": "nodemon --exec npm run cypress",
+    "cypress:open": "cypress open",
+    "cypress": "cypress run"
   },
-  "repository": {
-    "type": "git",
-    "url": "ssh://git@git.evopark.de:5555/marcus/keedrop.git"
-  },
+  "repository": "milgner/keedrop",
   "keywords": [
+    "secret",
+    "password",
     "secure",
     "online",
     "service"
@@ -20,6 +22,10 @@
   "license": "MIT",
   "devDependencies": {
     "@linthtml/linthtml": "^0.3.2",
-    "eslint": "^2.13.1"
+    "eslint": "6.8.0",
+    "eslint-plugin-cypress": "2.10.3"
+  },
+  "dependencies": {
+    "cypress": "4.5.0"
   }
 }
