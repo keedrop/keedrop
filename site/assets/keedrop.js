@@ -112,14 +112,14 @@ function pastebinAdapter(apiOptions) {
   }
 }
 
-var api = pastebinAdapter({
+/*var api = pastebinAdapter({
   api_paste_private: 1, // unlisted
   api_paste_expire_date: "10M",
   api_dev_key: "54c47562c67620c1c5cde10dad1c2b89",
   api_user_key: "a91facd26a9c74577d4e4a43c2ce409a"
-});
+});*/
 
-//var api = defaultAdapter("https://keedrop.com")
+var api = defaultAdapter("https://keedrop.com")
 
 function transferEncode(value) {
   return window.nacl.util.encodeBase64(value).replace(/\//g, "!");

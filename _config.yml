@@ -18,22 +18,18 @@ title: keedrop
 email: info@keedrop.com
 description: >- # this means to ignore newlines until "baseurl:"
   Send secrets in a secure way as one time disposable link.
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://keedrop.com" # the base hostname & protocol for your site, e.g. http://example.com
 permalink: pretty
 host: 0.0.0.0
 
 languages: ["en", "en", "de", "ru"]
-exclude_from_localizations: ["assets", "humans.txt", "robots.txt"]
+exclude_from_localizations: ["assets", "humans.txt", "robots.txt", "sitemap_index.xml"]
 
 # Build settings
 markdown: kramdown
 
 plugins:
   - jekyll-multiple-languages-plugin
-
-include:
-  - humans.txt
-  - robots.txt
 
 jekyll_tidy:
   exclude: ["humans.txt"]

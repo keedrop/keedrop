@@ -4,7 +4,9 @@ public
 .jekyll-metadata
 .env
 .env.build
-
+cypress/screenshots
+cypress/videos
+cypress/examples
 keedrop
 keedrop.exe
 

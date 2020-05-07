@@ -123,3 +123,7 @@ button:disabled {
 a.button.button-outline, button.button-outline {
   color: #000;
 }
+
+a.email[data-name]:after {
+  content: attr(data-name) "@" attr(data-domain) "." attr(data-tld);
+}
