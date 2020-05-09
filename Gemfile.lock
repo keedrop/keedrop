@@ -5,6 +5,7 @@ GEM
       public_suffix (>= 2.0.2, < 5.0)
     colorator (1.1.0)
     concurrent-ruby (1.1.6)
+    dotenv (2.7.5)
     em-websocket (0.5.1)
       eventmachine (>= 0.12.9)
       http_parser.rb (~> 0.6.0)
@@ -57,6 +58,7 @@ GEM
     pathutil (0.16.2)
       forwardable-extended (~> 2.6)
     public_suffix (4.0.4)
+    rake (13.0.1)
     rb-fsevent (0.10.4)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
@@ -82,11 +84,13 @@ PLATFORMS
   x64-mingw32
 
 DEPENDENCIES
+  dotenv
   eventmachine (= 1.2.7)
   jekyll (~> 4.0.0)
   jekyll-multiple-languages-plugin
   jekyll-sitemap
   jekyll-tidy
+  rake
   tzinfo (~> 1.2)
   tzinfo-data
   wdm (~> 0.1.0)
