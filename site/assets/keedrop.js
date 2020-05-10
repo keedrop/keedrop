@@ -1,125 +1,37 @@
 "use strict";
 
 function defaultAdapter(baseUrl) {
-  function request(url, data) {
+  function request(url, data, callback) {
     var req = new XMLHttpRequest();
     req.open(data ? "POST" : "GET", "https://cors-anywhere.herokuapp.com/" + url);
+    req.onreadystatechange = function() {
+      if (4 === req.readyState) {
+        if (req.status < 200 || req.status >= 400) {
+          callback(new Error("Could not send encrypted data to server"), "")
+        } else {
+          callback(undefined, JSON.parse(req.responseText));
+        }
+      }
+    };
     if (data) {
       req.setRequestHeader("Content-Type", "application/json");
       req.send(data);
     } else {
       req.send();
     }
-    return req;
-  };
+  }
 
   return {
     create: function(data, callback) {
-      try {
-        var req = request(baseUrl + "/api/secret", JSON.stringify(data));
-        req.onerror = function(event) {
-          callback(event.target);
-        };
-        req.addEventListener("loadend", function(event) {
-          callback(null, JSON.parse(event.target.responseText));
-        });
-      } catch (e) {
-        callback(e);
-      }
+      request(baseUrl, JSON.stringify(data), callback);
     },
     get: function(mnemo, callback) {
-      var req = request(baseUrl + "/api/secret/" + mnemo);
-      req.onerror = function(event) {
-        callback("keyDecodeFail");
-      };
-      req.addEventListener("loadend", function(event) {
-        if (event.target.status !== 200) {
-          return callback("secretNotFound")
-        }
-        callback(null, JSON.parse(event.target.responseText));
-      });
+      request(baseUrl + mnemo, undefined, callback);
     }
   };
-};
-
-function pastebinAdapter(apiOptions) {
-  function buildParams(data) {
-    return Object.keys(data).map(function(key) {
-      return key + "=" + encodeURIComponent(data[key]);
-    });
-  }
-  function request(url, data) {
-    var req = new XMLHttpRequest();
-    req.open(data ? "POST" : "GET", "https://cors-anywhere.herokuapp.com/" + url);
-    if (data !== undefined) {
-      req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-      var postData =
-        buildParams(data)
-        .concat(buildParams(apiOptions))
-        .join("&");
-      req.send(postData);
-    } else {
-      req.send();
-    }
-    return req;
-  }
-
-  return {
-    create: function(data, callback) {
-      try {
-        var req = request("https://pastebin.com/api/api_post.php", {
-          api_paste_code: JSON.stringify(data),
-          api_option: "paste"
-        });
-        req.onerror = function(event) {
-          callback(event.target);
-        };
-        req.addEventListener("loadend", function(event) {
-          callback(null, {
-            mnemo: event.target.responseText.replace("https://pastebin.com", "https://pastebin.com/raw")
-          });
-        });
-      } catch (e) {
-        callback(e);
-      }
-    },
-    get: function(url, callback) {
-      try {
-        var req = request(url);
-        req.onerror = function(event) {
-          callback("keyDecodeFail");
-        };
-        req.addEventListener("loadend", function(event) {
-          if (event.target.status !== 200) {
-            return callback("secretNotFound")
-          }
-          var json = JSON.parse(event.target.responseText);
-          req = request("https://pastebin.com/api/api_post.php", {
-            api_option: "delete",
-            api_paste_key: url.replace("https://pastebin.com/raw/", "")
-          });
-          req.onerror = function(event) {
-            callback("keyDecodeFail");
-          };
-          req.addEventListener("loadend", function(event) {
-            callback(null, json);
-          });
-        });
-      } catch (e) {
-        callback(e);
-      }
-    }
-  }
 }
 
-/*var api = pastebinAdapter({
-  api_paste_private: 1, // unlisted
-  api_paste_expire_date: "10M",
-  api_dev_key: "54c47562c67620c1c5cde10dad1c2b89",
-  api_user_key: "a91facd26a9c74577d4e4a43c2ce409a"
-});*/
-
-var api = defaultAdapter("https://keedrop.com")
+window.api = defaultAdapter("https://keedrop.com/api/secret/");
 
 function transferEncode(value) {
   return window.nacl.util.encodeBase64(value).replace(/\//g, "!");
@@ -158,7 +70,9 @@ function copyToClipboard(source, callback) {
 function onCopyClick(event) {
   event.preventDefault && event.preventDefault();
   copyToClipboard(document.getElementById("resultBox"), function(success) {
-    event.srcElement.innerText = "Copied";
+    if (success) {
+      event.srcElement.innerText = "Copied";
+    }
   });
   return false;
 }
@@ -170,12 +84,22 @@ function hideError() {
 
 function showError(messageId, hideContent) {
   var errorDiv = document.querySelector(".error");
-  errorDiv.innerHTML = ERRORS[messageId];
+  errorDiv.innerHTML = ERRORS[messageId] || messageId;
   errorDiv.classList.add("reveal");
   if (hideContent) {
     var content = document.querySelector(".content");
     content.classList.add("hide");
   }
+}
+
+function showResult(result) {
+  var resultBox = document.getElementById("resultBox");
+  resultBox.value = result;
+  resultBox.parentNode.parentNode.parentNode.classList.add("reveal");
+  resultBox.focus();
+  resultBox.select();
+  // For mobile devices
+  resultBox.setSelectionRange(0, 9999);
 }
 
 function onEncryptSubmit(event) {
@@ -195,7 +119,7 @@ function onEncryptSubmit(event) {
   var button = form.querySelector("button");
   button.disabled = true;
 
-  api.create({
+  window.api.create({
     pubkey: transferEncode(keyPair.publicKey),
     nonce: transferEncode(nonce),
     secret: transferEncode(encrypted)
@@ -205,20 +129,14 @@ function onEncryptSubmit(event) {
       return showError("sendFail");
     }
     var decodeLink = location.protocol + "//" + location.host + "/r#" + result.mnemo + "_" + transferEncode(keyPair.secretKey);
-    resultBox.value = decodeLink;
-    resultBox.parentNode.parentNode.parentNode.classList.add("reveal");
-    resultBox.focus();
-    resultBox.select();
-    // For mobile devices
-    resultBox.setSelectionRange(0, 9999);
+    showResult(decodeLink);
   });
   return false;
 }
 
-function onDecryptClicked(resultBox) {
+function onDecryptClicked() {
   if (location.hash.indexOf("_") == -1) {
-    showError("noSecretId");
-    return;
+    return showError("noSecretId");
   }
 
   var components = location.hash.substr(1).split("_");
@@ -230,7 +148,7 @@ function onDecryptClicked(resultBox) {
     if (decodedSecretKey.length != 32) {
       throw new Error("Key length mismatch");
     }
-    api.get(mnemo, function(error, result) {
+    window.api.get(mnemo, function(error, result) {
       if (error) {
         return showError("keyDecodeFail", true);
       }
@@ -240,8 +158,7 @@ function onDecryptClicked(resultBox) {
         transferDecode(result.pubkey),
         decodedSecretKey);
       if (plainText) {
-        resultBox.value = window.nacl.util.encodeUTF8(plainText);
-        resultBox.parentNode.parentNode.parentNode.classList.add("reveal");
+        showResult(window.nacl.util.encodeUTF8(plainText));
       } else {
         showError("decryptionFailed");
       }
@@ -254,8 +171,7 @@ function onDecryptClicked(resultBox) {
 function initReadPage() {
   var button = document.querySelector("button:disabled");
   button.disabled = false;
-  var resultBox = document.getElementById("resultBox");
-  button.onclick = onDecryptClicked.bind(document, resultBox);
+  button.onclick = onDecryptClicked;
 }
 
 function initStorePage() {
@@ -267,17 +183,12 @@ function initStorePage() {
 
 window.addEventListener("click", function(event) {
   var source = event.srcElement;
-  // E-Mail spam protection
-  if (source.tagName === "A" && source.dataset.name && source.dataset.domain && source.dataset.tld) {
-    window.location.href = "mailto:" + source.dataset.name + "@" + source.dataset.domain + "." + source.dataset.tld;
-    event.preventDefault();
-    return false;
-  } else if (source.id === "copy") {
+  if (source.id === "copy") {
     return onCopyClick(event);
   }
-})
+});
 
-window.addEventListener("load", function() {
+window.addEventListener("DOMContentLoaded", function() {
   if (document.getElementById("encrypt") != null) {
     initStorePage();
   } else if (document.getElementById("decrypt") != null) {

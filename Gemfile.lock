@@ -3,6 +3,7 @@ GEM
   specs:
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
+    coderay (1.1.2)
     colorator (1.1.0)
     concurrent-ruby (1.1.6)
     dotenv (2.7.5)
@@ -34,6 +35,8 @@ GEM
       rouge (~> 3.0)
       safe_yaml (~> 1.0)
       terminal-table (~> 1.8)
+    jekyll-environment-variables (1.0.1)
+      jekyll (>= 3.0, < 5.x)
     jekyll-multiple-languages-plugin (1.6.1)
       jekyll (>= 2.0, < 5.0)
     jekyll-sass-converter (2.1.0)
@@ -55,8 +58,12 @@ GEM
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
     mercenary (0.3.6)
+    method_source (0.9.2)
     pathutil (0.16.2)
       forwardable-extended (~> 2.6)
+    pry (0.12.2)
+      coderay (~> 1.1.0)
+      method_source (~> 0.9.0)
     public_suffix (4.0.4)
     rake (13.0.1)
     rb-fsevent (0.10.4)
@@ -87,9 +94,11 @@ DEPENDENCIES
   dotenv
   eventmachine (= 1.2.7)
   jekyll (~> 4.0.0)
+  jekyll-environment-variables
   jekyll-multiple-languages-plugin
   jekyll-sitemap
   jekyll-tidy
+  pry (~> 0.12.2)
   rake
   tzinfo (~> 1.2)
   tzinfo-data

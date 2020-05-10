@@ -5,13 +5,13 @@ title: titles.decrypt
 scripts: true
 ---
 <noscript>
-  <div class="row error reveal">The password is decrypted locally and for that you need to enable JavaScript.</div>
+  <div class="row error reveal">The secret is decrypted locally and for that you need to enable JavaScript.</div>
 </noscript>
 <div class="row error animate-show">
 </div>
 <div class="row content">
   <div class="column">
-    <p>Remember, each password can be retrieved only once</p>
+    <p>Remember, each secret can be retrieved only once</p>
     {% capture text %}{% t decrypt %}{% endcapture %}
     {% include submitButton.html id="decrypt" text=text %}
   </div>

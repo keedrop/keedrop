@@ -80,6 +80,13 @@ body {
   bottom: 0;
 }
 
+footer nav a:after {
+  content: " | "
+}
+footer nav a:last-child:after {
+  content: none;
+}
+
 .row.content .column {
   padding: 2em 0;
 }
@@ -122,8 +129,4 @@ button:disabled {
 
 a.button.button-outline, button.button-outline {
   color: #000;
-}
-
-a.email[data-name]:after {
-  content: attr(data-name) "@" attr(data-domain) "." attr(data-tld);
 }

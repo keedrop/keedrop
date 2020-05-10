@@ -1,4 +1,12 @@
-source "https://rubygems.org"
+source 'https://rubygems.org'
+
+# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
+# and associated library.
+install_if -> { RUBY_PLATFORM =~ %r!mingw|mswin|java! } do
+  gem 'eventmachine', '1.2.7', platforms: :ruby
+  gem 'tzinfo', '~> 1.2'
+  gem 'tzinfo-data'
+end
 
 # Hello! This is where you manage which Jekyll version is used to run.
 # When you want to use a different version, change it below, save the
@@ -8,7 +16,7 @@ source "https://rubygems.org"
 #
 # This will help ensure the proper Jekyll version is running.
 # Happy Jekylling!
-gem "jekyll", "~> 4.0.0"
+gem 'jekyll', '~> 4.0.0'
 
 # Use rake as a build system
 gem 'rake'
@@ -21,17 +29,12 @@ gem 'dotenv'
 # If you have any plugins, put them here!
 group :jekyll_plugins do
   gem 'jekyll-multiple-languages-plugin'
+  gem 'jekyll-environment-variables'
   gem 'jekyll-sitemap'
-  gem "jekyll-tidy"
+  gem 'jekyll-tidy'
 end
 
-# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-# and associated library.
-install_if -> { RUBY_PLATFORM =~ %r!mingw|mswin|java! } do
-  gem "tzinfo", "~> 1.2"
-  gem "tzinfo-data"
-  gem 'eventmachine', '1.2.7', platforms: :ruby
-end
+gem 'pry', '~> 0.12.2'
 
 # Performance-booster for watching directories on Windows
-gem "wdm", "~> 0.1.0", install_if: Gem.win_platform?
+gem 'wdm', '~> 0.1.0', :install_if => Gem.win_platform?
