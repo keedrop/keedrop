@@ -2,6 +2,7 @@ _site
 public
 .sass-cache
 .jekyll-metadata
+**/.jekyll-cache/*
 .env
 .env.build
 cypress/screenshots
