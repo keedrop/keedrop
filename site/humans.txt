@@ -2,13 +2,10 @@
 ---
 /* TEAM */
   {%- for author in site.data.authors %}
-	{{ author.name }}
+    {{ author.name }}
   {%- endfor %}
 
-/* THANKS */
-	Nobody
-
 /* SITE */
-	Last update: {{ site.time | date_to_xmlschema }}
-	Standards: HTML5, CSS3, JavaScript
-	Software: VS Code, Caddy, Go
+    Last update: {{ site.time | date_to_xmlschema }}
+    Standards: HTML5, CSS3, JavaScript
+    Software: VS Code, Caddy, Go
