@@ -12,7 +12,7 @@
       <link rel="alternate" hreflang="{{lang}}" href="/{{lang}}{{page.url}}">
     {% endfor %}
     <title>KeeDrop: securely send passwords | {% t page.title %}</title>
-    <link rel="author" href="humans.txt">
+    <link rel="author" href="/humans.txt">
     <link href="/assets/milligram.min.css" rel="stylesheet" type="text/css">
     <link href="/assets/styles.css" rel="stylesheet" type="text/css">
   </head>
@@ -27,10 +27,10 @@
         {{ content }}
       </main>
       <footer class="row footer">
-        <div class="column">
+        <nav class="column">
           <a href="{{ "/imprint" | prepend: site.baseurl }}" rel="about">{% t titles.imprint %}</a>
-          <a href="/humans.txt"><img alt="humans.txt logo" src="/assets/humanstxt.png">humans.txt</a>
-        </div>
+          <a href="/humans.txt">humans.txt</a>
+        </nav>
       </footer>
     </div>
   </body>
