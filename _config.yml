@@ -31,8 +31,11 @@ markdown: kramdown
 plugins:
   - jekyll-multiple-languages-plugin
 
+include:
+  - humans.txt
+
 jekyll_tidy:
-  exclude: ["humans.txt"]
+  exclude: ["humans.txt", "*.js"]
 
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
