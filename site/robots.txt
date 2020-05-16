@@ -1,0 +1,5 @@
+---
+---
+User-agent: *
+Disallow: /api/
+Sitemap: {{site.url}}/sitemap_index.xml

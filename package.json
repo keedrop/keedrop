@@ -1,0 +1,33 @@
+{
+  "name": "keedrop",
+  "version": "1.0.0",
+  "description": "secure secret dump",
+  "main": "keedrop.js",
+  "scripts": {
+    "lint": "eslint assets/keedrop.js",
+    "test": "npm run cypress",
+    "test:dev": "nodemon --exec npm run cypress",
+    "cypress:open": "cypress open",
+    "cypress": "cypress run"
+  },
+  "repository": "milgner/keedrop",
+  "keywords": [
+    "secret",
+    "password",
+    "secure",
+    "online",
+    "service"
+  ],
+  "author": "Marcus Ilgner",
+  "license": "MIT",
+  "devDependencies": {
+    "@linthtml/linthtml": "^0.3.2",
+    "cypress-dotenv": "^1.2.1",
+    "eslint": "6.8.0",
+    "eslint-plugin-cypress": "2.10.3"
+  },
+  "dependencies": {
+    "cypress": "4.5.0",
+    "dotenv": "^8.2.0"
+  }
+}

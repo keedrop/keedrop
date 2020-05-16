@@ -1,0 +1,29 @@
+---
+layout: default
+header: headers.home
+scripts: true
+title: titles.home
+---
+<noscript>
+  <div class="row error reveal">The secret is encrypted locally and for that you need to enable JavaScript.</div>
+</noscript>
+
+<div class="row error animate-show"></div>
+<div class="row content">
+  <div class="column">
+    <form id="storeForm">
+      <input id="secret" name="secret" type="text" required autofocus/>
+      {% capture text %}{% t encrypt %}{% endcapture %}
+      {% include submitButton.html id="encrypt" text=text %}
+    </form>
+  </div>
+</div>
+<div class="row secret-link animate-show">
+  <div class="column">
+    <form>
+      <div>Send this link to the recipient:</div>
+      <input id="resultBox" type="text" readonly/><button id="copy">Copy</button>
+      <div class="returnToCopy">(Press RETURN to copy to clipboard)</div>
+    </form>
+  </div>
+</div>

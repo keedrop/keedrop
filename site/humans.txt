@@ -1,0 +1,11 @@
+---
+---
+/* TEAM */
+  {%- for author in site.data.authors %}
+    {{ author.name }}
+  {%- endfor %}
+
+/* SITE */
+    Last update: {{ site.time | date_to_xmlschema }}
+    Standards: HTML5, CSS3, JavaScript
+    Software: VS Code, Caddy, Go

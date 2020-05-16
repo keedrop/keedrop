@@ -1,0 +1,12 @@
+errors:
+  enableJavaScriptButton: Bitte schalten Sie JavaScript ein
+headers:
+  home: Geheimnisse Sicher Versenden
+  imprint: KeeDrop
+  decrypt: Jemand hat Ihnen ein Geheimnis geschickt
+titles:
+  home: Homepage
+  decrypt: Entschlüsseln
+  imprint: Impressum
+encrypt: Verschlüsseln
+decrypt: Entschlüsseln

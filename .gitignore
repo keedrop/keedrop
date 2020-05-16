@@ -1,6 +1,18 @@
+_site
+public
+.sass-cache
+.jekyll-metadata
+**/.jekyll-cache/*
+.env
+.env.build
+cypress/screenshots
+cypress/videos
+cypress/examples
 keedrop
+keedrop.exe
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+node_modules

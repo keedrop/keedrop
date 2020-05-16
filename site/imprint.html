@@ -1,0 +1,23 @@
+---
+layout: default
+
+header: headers.imprint
+title: titles.imprint
+
+scripts: true
+---
+<div class="row">
+  <div class="column content">
+    <h3>{% t page.title %}</h3>
+    {%- tf imprint.html -%}
+    <p>
+      {% include email.html email="mail@marcusilgner.com" %}
+    </p>
+    <p>GPG Key Id <code>E5FF731E</code></p>
+  </div>
+</div>
+<div class="row">
+  <div class="column">
+    <a class="button button-outline" href="{{ "/" | prepend: site.baseurl }}">{% t titles.home %}</a>
+  </div>
+</div>

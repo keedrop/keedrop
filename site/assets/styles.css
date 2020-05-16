@@ -11,7 +11,7 @@ body {
 }
 
 .tagline {
-  color: white;
+  color: black;
   padding: 5% 0;
   background-color: #efbd47;
   line-height: 100em;
@@ -57,7 +57,7 @@ body {
   color: white;
 }
 
-.animate-show {  
+.animate-show {
   transition: max-height 0.25s ease-out;
 }
 
@@ -80,6 +80,13 @@ body {
   bottom: 0;
 }
 
+footer nav a:after {
+  content: " | "
+}
+footer nav a:last-child:after {
+  content: none;
+}
+
 .row.content .column {
   padding: 2em 0;
 }
@@ -98,15 +105,28 @@ input#resultBox {
   background-color: white;
 }
 
+.returnToCopy {
+  display: none;
+}
+
+input#resultBox:focus ~ .returnToCopy {
+  display: block;
+}
+
 a {
-  color: #efbd47;
+  color: black;
 }
 
 a.button, button {
   border-color: #efbd47;
   background-color: #efbd47;
+  color: black
+}
+
+button:disabled {
+  color: #000;
 }
 
 a.button.button-outline, button.button-outline {
-  color: #efbd47;
+  color: #000;
 }
