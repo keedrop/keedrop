@@ -6,6 +6,7 @@ import (
 	"github.com/dchest/uniuri"
 	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
+        "github.com/gin-contrib/static"
 	"github.com/mediocregopher/radix/v3"
 	"github.com/op/go-logging"
 	"net/http"
@@ -163,12 +164,11 @@ func listenPort() string {
 func setupRouter(redis *radix.Pool) *gin.Engine {
 	router := gin.Default()
 
+	router.Use(static.Serve("/", static.LocalFile("./_site", true)))
+
 	router.POST("/api/secret", wrapHandler(redis, storeSecret))
 	router.GET("/api/secret/:mnemo", wrapHandler(redis, retrieveSecret))
-	router.Static("/assets", "./assets")
-	router.StaticFile("/imprint", "./imprint.html")
-	router.StaticFile("/r", "./retrieve.html")
-	router.StaticFile("/", "./store.html")
+
 	return router
 }
 
