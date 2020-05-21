@@ -5,13 +5,13 @@ title: titles.decrypt
 scripts: true
 ---
 <noscript>
-  <div class="row error reveal">The secret is decrypted locally and for that you need to enable JavaScript.</div>
+  <div class="row error reveal">{% t errors.enableJavaScriptText %}</div>
 </noscript>
 <div class="row error animate-show">
 </div>
 <div class="row content">
   <div class="column">
-    <p>Remember, each secret can be retrieved only once</p>
+    <p>{% t retrieve.onlyOnce %}</p>
     {% capture text %}{% t decrypt %}{% endcapture %}
     {% include submitButton.html id="decrypt" text=text %}
   </div>
@@ -19,9 +19,9 @@ scripts: true
 <div class="row secret-link animate-show">
   <div class="column">
     <form>
-      <div>Here you are:</div>
-      <input id="resultBox" type="text" readonly/><button id="copy">Copy</button>
-      <div class="returnToCopy">(Press RETURN to copy to clipboard)</div>
+      <div>{% t result.present %}:</div>
+      <input id="resultBox" type="text" readonly/><button id="copy">{% t result.copy %}</button>
+      <div class="returnToCopy">({% t result.returnToCopy %})</div>
     </form>
   </div>
 </div>

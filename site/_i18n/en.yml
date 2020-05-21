@@ -1,5 +1,7 @@
+tagline: Transfer Secrets Securely
 errors:
   enableJavaScriptButton: Please enable JavaScript
+  enableJavaScriptText: Cryptopgrahy is performed in the browser and for that you need to enable JavaScript.
 headers:
   home: Transfer Secrets Securely
   imprint: KeeDrop
@@ -10,3 +12,10 @@ titles:
   decrypt: Decrypt
 encrypt: Encrypt
 decrypt: Decrypt
+retrieve:
+  onlyOnce: Remember, each secret can be retrieved only once
+result:
+  description: Send this link to the recipient
+  copy: Copy
+  returnToCopy: Press RETURN to copy to clipboard
+  present: Here you are
