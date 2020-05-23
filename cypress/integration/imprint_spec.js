@@ -19,7 +19,7 @@ context("Imprint page", function () {
 
     it("should have translated infos on non German page", function() {
       cy.visit("/imprint/");
-      cy.contains("Contact according with German law:").should("exist");
+      cy.contains("Contact in compliance with german law:").should("exist");
     });
   });
 

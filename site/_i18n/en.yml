@@ -18,7 +18,7 @@ decrypt:
 retrieve:
   onlyOnce: Remember, each secret can be retrieved only once
 imprint:
-  contact: Contact according with German law
+  contact: Contact in compliance with german law
 result:
   description: Send this link to the recipient
   copy: Copy
