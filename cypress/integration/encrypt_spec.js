@@ -1,49 +1,49 @@
 context("Create secrets", function () {
   beforeEach(function() {
-    cy.visit('/')
-  })
+    cy.visit("/");
+  });
 
   it("Should not show noscript content", function() {
-    cy.contains("The password is encrypted locally and for that you need to enable JavaScript.").not()
-  })
+    cy.contains("The secret is encrypted locally").not();
+  });
 
   describe("API Server errors", function() {
     before(function() {
-      cy.server({ force404: true })
+      cy.server({ force404: true });
       cy.route({
-        method: 'POST',
-        url: '/api/secret',
+        method: "POST",
+        url: "/api/secret",
         response: { mnemo: "deadbeadd00de"}
-      })
-    })
+      });
+    });
 
     it("API Server not responsive", function() {
       // does not work cy.focused().should("have.id", "secret")
-      cy.get("#secret").type("Test").should("have.value", "Test")
-      cy.contains('Encrypt').click()
-      cy.contains("Could not connect")
-    })
-  })
+      cy.get("#secret").type("Test").should("have.value", "Test");
+      cy.contains("Encrypt").click();
+      cy.contains("Could not connect");
+    });
+  });
 
   describe("Encrypt", function() {
     before(function() {
-      cy.server({ force404: true })
+      cy.server({ force404: true });
       cy.route({
-        method: 'POST',
-        url: '/api/secret',
+        method: "POST",
+        url: "/api/secret",
         response: { mnemo: "deadbeadd00de"}
-      })
-    })
+      });
+    });
 
     it("API server generates a secret", function() {
-      cy.get("#secret").type("Test").should("have.value", "Test")
-      cy.contains('Encrypt').click()
-      cy.contains("Send this link")
-    })
+      cy.get("#secret").type("Test").should("have.value", "Test");
+      cy.contains("Encrypt").click();
+      cy.contains("Send this link");
+    });
 
     it("should submit the form on press of ENTER", function() {
-      cy.get("#secret").type("Test{enter}")
+      cy.get("#secret").type("Test{enter}");
       cy.contains("Send this link");
-    })
-  })
-})
+    });
+  });
+});

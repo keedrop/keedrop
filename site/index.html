@@ -12,9 +12,9 @@ title: titles.home
 <div class="row content">
   <div class="column">
     <form id="storeForm">
-      <label for="secret">Secret:</label>
+      <label for="secret">{% t encrypt.label %}:</label>
       <input id="secret" name="secret" type="text" required autofocus/>
-      {% capture text %}{% t encrypt %}{% endcapture %}
+      {% capture text %}{% t encrypt.button %}{% endcapture %}
       {% include submitButton.html id="encrypt" text=text %}
     </form>
   </div>

@@ -10,12 +10,17 @@ titles:
   home: Homepage
   decrypt: Entschlüsseln
   imprint: Impressum
-encrypt: Verschlüsseln
-decrypt: Entschlüsseln
+encrypt:
+  label: Geheimnis
+  button: Verschlüsseln
+decrypt:
+  button: Entschlüsseln
 retrieve:
   onlyOnce: "Hinweis: Jedes Geheimnis kann nur einmal entschlüsselt werden"
+imprint:
+  contact: Anbieter im Sinne des TDG/MDStV
 result:
-  description: Verschicken Sie diesen Link 
+  description: Verschicken Sie diesen Link
   copy: Kopieren
   returnToCopy: EINGABE drücken, um in die Zwischenablage zu kopieren
   present: Bitte sehr

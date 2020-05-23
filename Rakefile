@@ -35,7 +35,7 @@ desc 'Preview on local machine (server with --auto)'
 task preview: :clean do
   compass('compile') # so that we are sure sass has been compiled before we run the server
   compass('watch &')
-  jekyll('serve --watch')
+  jekyll('serve -wl')
 end
 task serve: :preview
 
@@ -50,7 +50,7 @@ task :build, [:deployment_configuration] => :clean do |t, args|
     puts "Are you sure you want to continue? [Y|n]"
 
     ans = STDIN.gets.chomp
-    exit if ans != 'Y' 
+    exit if ans != 'Y'
   end
 
   compass('compile')
@@ -69,7 +69,7 @@ task :deploy, [:deployment_configuration] => :build do |t, args|
     puts "Are you sure you want to continue? [Y|n]"
 
     ans = STDIN.gets.chomp
-    exit if ans != 'Y' 
+    exit if ans != 'Y'
   end
 
   sh "rsync -av -e '#{$rsync_rsh}' --delete _site/ #{$deploy_dir}"
