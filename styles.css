@@ -1,0 +1,21 @@
+main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+section#get {
+  flex: 1;
+  width: 80%;
+  text-align: center;
+}
+
+#error {
+    display: none;
+    color: darkred;
+    font-family: monospace;
+}
+
+#error.error {
+    display: block
+}
