@@ -1,5 +1,6 @@
 {
   "name": "keedrop",
+  "private": true,
   "version": "1.0.0",
   "description": "secure secret dump",
   "main": "keedrop.js",
@@ -21,13 +22,13 @@
   "author": "Marcus Ilgner",
   "license": "MIT",
   "devDependencies": {
-    "@linthtml/linthtml": "^0.3.2",
-    "cypress-dotenv": "^1.2.1",
-    "eslint": "6.8.0",
+    "@linthtml/linthtml": "0.3.2",
+    "cypress": "4.5.0",
+    "cypress-dotenv": "1.2.1",
+    "eslint": "7.0.0",
     "eslint-plugin-cypress": "2.10.3"
   },
   "dependencies": {
-    "cypress": "4.5.0",
-    "dotenv": "^8.2.0"
+    "dotenv": "8.2.0"
   }
 }
