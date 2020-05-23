@@ -16,3 +16,7 @@ keedrop.exe
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 node_modules
+
+# IntelliJ
+.idea/
+
