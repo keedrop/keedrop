@@ -10,8 +10,11 @@ titles:
   home: Home
   imprint: Imprint
   decrypt: Decrypt
-encrypt: Encrypt
-decrypt: Decrypt
+encrypt:
+  label: Secret
+  button: Encrypt
+decrypt:
+  button: Decrypt
 retrieve:
   onlyOnce: Remember, each secret can be retrieved only once
 imprint:

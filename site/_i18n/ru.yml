@@ -6,5 +6,7 @@ titles:
   home: кодировать
   imprint: импрессум
   decrypt: декодировать
-encrypt: кодировать
-decrypt: декодировать
+encrypt:
+  button: кодировать
+decrypt:
+  button: декодировать
