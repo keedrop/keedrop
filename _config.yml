@@ -20,14 +20,6 @@ description: >- # this means to ignore newlines until "baseurl:"
 url: "https://keedrop.com" # the base hostname & protocol for your site, e.g. http://example.com
 permalink: pretty
 host: 0.0.0.0
-contact:
-  name: Marcus Ilgner
-  address:
-    - Kölner Strasse 98
-    - 53840 Troisdorf
-    - Germany
-  email: mail@marcusilgner.com
-  gpgkey: E5FF731E
 
 languages: ["en", "en", "de", "ru"]
 exclude_from_localizations: ["assets", "humans.txt", "robots.txt", "sitemap_index.xml"]
@@ -37,6 +29,7 @@ markdown: kramdown
 
 plugins:
   - jekyll-multiple-languages-plugin
+  - ./_plugins/env_data.rb
 
 include:
   - humans.txt
