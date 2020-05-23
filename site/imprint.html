@@ -3,13 +3,11 @@ layout: default
 
 header: headers.imprint
 title: titles.imprint
-
-scripts: true
 ---
 <div class="row">
   <div class="column content">
     <h3>{% t page.title %}</h3>
-    Anbieter i.S.d. TMG:
+    {% t imprint.contact %}:
     <address>
       <p>
         Marcus Ilgner<br/>
@@ -18,10 +16,22 @@ scripts: true
         Germany
       </p>
     </address>
+      <p>
+        {{ site.contact.name }}<br>
+        {%- for line in site.contact.address -%}
+          {{line}}<br>
+        {%- endfor -%}
+      </p>
+    </address>
     <p>
-      {% include email.html email="mail@marcusilgner.com" %}
+      {%- capture email %}{{site.env.contact_email | default: site.contact.email}}{%- endcapture -%}
+      {% include email.html email=email %}
     </p>
-    <p>GPG Key Id <code>E5FF731E</code></p>
+    {%- if site.env.contact_gpgkey or site.contact.gpgkey -%}
+      {%- capture gpgkey %}{{site.env.contact_gpgkey | default: site.contact.gpgkey}}{%- endcapture -%}
+      {%- capture href %}http://keys.gnupg.net/pks/lookup?search=0x{{gpgkey}}&fingerprint=on&op=index{%- endcapture -%}
+      <p>GPG Key Id <code>{%- include link.html href=href text=gpgkey-%}</code></p>
+    {%- endif -%}
   </div>
 </div>
 <div class="row">

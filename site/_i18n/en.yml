@@ -14,6 +14,8 @@ encrypt: Encrypt
 decrypt: Decrypt
 retrieve:
   onlyOnce: Remember, each secret can be retrieved only once
+imprint:
+  contact: Contact according with German law
 result:
   description: Send this link to the recipient
   copy: Copy
