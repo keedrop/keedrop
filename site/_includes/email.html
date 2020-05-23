@@ -1,1 +1,3 @@
-<a class="email" href="mailto:{{include.email}}"rel="noreferrer noopener">{{include.text | default: include.email}}</a>
+{%- assign email = include.email | prepend: "mailto:" -%}
+{%- assign text = include.text | default: include.email -%}
+{% include link.html href=email text=text %}
