@@ -174,6 +174,10 @@ function initReadPage() {
   var button = document.querySelector("button:disabled");
   button.disabled = false;
   button.onclick = onDecryptClicked;
+  // Don't lose the hash part when switching languages ;)
+  Array.prototype.forEach.call(document.querySelectorAll(".languages a"), function(link) {
+    link.href = link.href + location.hash;
+  });
 }
 
 function initStorePage() {
