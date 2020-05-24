@@ -1,7 +1,7 @@
 context("Language relations", function () {
   it("should show language bar", function() {
     cy.visit("/");
-    cy.contains("en de ru");
+    cy.contains("en de ru").should("exist");
   });
 
   it("should contain the hash in the links", function() {
