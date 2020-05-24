@@ -29,7 +29,6 @@ markdown: kramdown
 
 plugins:
   - jekyll-multiple-languages-plugin
-  - ./_plugins/env_data.rb
 
 include:
   - humans.txt

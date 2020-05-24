@@ -1,13 +1,15 @@
+---
+---
 "use strict";
 
 function defaultAdapter(baseUrl) {
   function request(url, data, callback) {
     var req = new XMLHttpRequest();
-    req.open(data ? "POST" : "GET", "https://cors-anywhere.herokuapp.com/" + url);
+    req.open(data ? "POST" : "GET", url);
     req.onreadystatechange = function() {
       if (4 === req.readyState) {
         if (req.status < 200 || req.status >= 400) {
-          callback(new Error("Could not send encrypted data to server"), "")
+          callback(new Error("Could not send encrypted data to server"), "");
         } else {
           callback(undefined, JSON.parse(req.responseText));
         }
@@ -31,7 +33,7 @@ function defaultAdapter(baseUrl) {
   };
 }
 
-window.api = defaultAdapter("https://keedrop.com/api/secret/");
+window.api = defaultAdapter("{{site.env.KEEDROP_API_PREFIX}}https://keedrop.com/api/secret/");
 
 function transferEncode(value) {
   return window.nacl.util.encodeBase64(value).replace(/\//g, "!");

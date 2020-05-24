@@ -10,16 +10,16 @@ title: titles.imprint
     {% t imprint.contact %}:
     <address>
       <p>
-        {{ site.data.contact.name }}<br>
-        {{ site.data.contact.address | newline_to_br }}
+        {{ site.env.KEEDROP_CONTACT_NAME | default: "KEEDROP_CONTACT_NAME missing" }}<br>
+        {{ site.env.KEEDROP_CONTACT_ADDRESS | default: "KEEDROP_CONTACT_ADDRESS missing" | newline_to_br }}
       </p>
     </address>
     <p>
-      {%- capture email %}{{site.data.contact.email}}{%- endcapture -%}
+      {%- capture email %}{{site.env.KEEDROP_CONTACT_EMAIL}}{%- endcapture -%}
       {% include email.html email=email %}
     </p>
-    {%- if site.data.contact.gpgkey -%}
-      {%- capture gpgkey %}{{site.data.contact.gpgkey}}{%- endcapture -%}
+    {%- if site.env.KEEDROP_CONTACT_GPGKEY -%}
+      {%- capture gpgkey %}{{site.env.KEEDROP_CONTACT_GPGKEY}}{%- endcapture -%}
       {%- capture href %}http://keys.gnupg.net/pks/lookup?search=0x{{gpgkey}}&fingerprint=on&op=index{%- endcapture -%}
       <p>GPG Key Id <code>{%- include link.html href=href text=gpgkey-%}</code></p>
     {%- endif -%}

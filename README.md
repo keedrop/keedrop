@@ -25,3 +25,14 @@ with key verification.
 
 - Malicious software (browser extensions, keylogger etc) on the senders or recipients computer.
 - Someone intercepting the link and retrieving the secret. But at least you'll know about it.
+
+## Setup
+
+### Environment variables
+
+| name | required | value |
+|------|----------|-------|
+|`KEEDROP_CONTACT_NAME`|yes|Full name of site owner|
+|`KEEDROP_CONTACT_ADDRESS`|yes|Quoted new-line delimited address info|
+|`KEEDROP_CONTACT_EMAIL`|yes|Email for contact|
+|`KEEDROP_CONTACT_GPGKEY`|no|GPG key|

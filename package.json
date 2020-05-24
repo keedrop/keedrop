@@ -5,7 +5,7 @@
   "description": "secure secret dump",
   "main": "keedrop.js",
   "scripts": {
-    "lint": "eslint assets/keedrop.js",
+    "lint": "eslint site/assets/keedrop.js",
     "test": "npm run cypress",
     "test:dev": "nodemon --exec npm run cypress",
     "cypress:open": "cypress open",
