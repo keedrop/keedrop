@@ -22,6 +22,11 @@
         <div class="column tagline">
           <h2>{% t page.header %}</h2>
         </div>
+        <nav class="languages">
+          {% for lang in unique_languages %}
+            <a rel="alternate" hreflang="{{lang}}" href="/{{lang}}{{page.url}}">{{lang}}</a>
+          {% endfor %}
+        </nav>
       </header>
       <main>
         {{ content }}

@@ -11,6 +11,12 @@ html, body {
   margin: 0;
 }
 
+header .languages {
+  position: absolute;
+  right: 10px;
+  top: 0;
+}
+
 .tagline {
   color: black;
   padding: 5% 0;
@@ -81,10 +87,10 @@ html, body {
   bottom: 0;
 }
 
-footer nav a:after {
+nav a:after {
   content: " | "
 }
-footer nav a:last-child:after {
+nav a:last-child:after {
   content: none;
 }
 
