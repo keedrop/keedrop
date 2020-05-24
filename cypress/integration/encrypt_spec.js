@@ -4,7 +4,7 @@ context("Create secrets", function () {
   });
 
   it("Should not show noscript content", function() {
-    cy.contains("The secret is encrypted locally").not();
+    cy.contains("Cryptopgrahy is performed in the browser").not();
   });
 
   describe("API Server errors", function() {

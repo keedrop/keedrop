@@ -6,7 +6,7 @@ context("Imprint page", function () {
     ].forEach(url => {
       it("contains the GPG key on " + url, function() {
         cy.visit(url);
-        cy.contains("E5FF731E").should("exist");
+        cy.contains("GPG Key").should("exist");
       });
     });
   });
