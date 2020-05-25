@@ -3,10 +3,6 @@
     display: none;
   }
   </style>
-  <button disabled>
-    {% t errors.enableJavaScriptButton %}
-  </button>
+  <button disabled>{% t errors.enableJavaScriptButton %}</button>
 </noscript>
-<button id="{{ include.id }}" disabled>
-  {{ include.text }}
-</button>
+<button id="{{ include.id }}" disabled>{{ include.text }}</button>
