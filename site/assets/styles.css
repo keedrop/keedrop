@@ -98,6 +98,14 @@ nav span:last-child::after {
   content: none;
 }
 
+nav a img {
+  vertical-align: middle;
+}
+
+nav a[href$=imprint] {
+  text-transform: lowercase;
+}
+
 .row.content .column {
   padding: 2em 0;
 }

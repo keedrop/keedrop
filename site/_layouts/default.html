@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="{{site.description}}">
     <meta name="author" content="Marcus Ilgner">
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self';img-src 'self';style-src 'unsafe-inline' 'self';">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self';img-src 'self' img.shields.io;style-src 'unsafe-inline' 'self';">
     <meta http-equiv="Content-Language" content="{{site.lang}}">
     {% assign unique_languages = site.languages | uniq %}
     {% for lang in unique_languages %}
@@ -38,7 +38,13 @@
       <footer class="row footer">
         <nav class="column">
           <a href="{{ "/imprint" | prepend: site.baseurl }}" rel="about">{% t titles.imprint %}</a>
-          <a href="/humans.txt">humans.txt</a>
+          <a href="/humans.txt" title="{% t titles.humans %}">humans.txt</a>
+          <a href="https://github.com/milgner/keedrop" title="{% t titles.source.title %}">
+            <img src="https://img.shields.io/badge/source%20code-gray?logo=github&style=flat-square" height="20" width="95" alt="{% t titles.source.badge %}">
+          </a>
+          <a href="https://status.keedrop.com" title="{% t titles.status.title %}">
+            <img src="https://img.shields.io/uptimerobot/ratio/m785003856-8aa9823b6992a1796824c5a6?style=flat-square" height="20" width="110" alt="{% t titles.status.badge %}">
+          </a>
         </nav>
       </footer>
     </div>
