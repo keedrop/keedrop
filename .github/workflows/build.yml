@@ -62,10 +62,13 @@ jobs:
         bundle install --jobs 4 --retry 3
 
     - name: Build static site
-      run: rake build
+      run: |
+        bundle config path vendor/bundle
+        rake build
       
     - name: Test static site
       run: |
+        bundle config path vendor/bundle
         rake serve&
         npm ci
         npm test
