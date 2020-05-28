@@ -39,6 +39,10 @@ jobs:
       with:
         ruby-version: "2.7"
       id: ruby
+    - name: Set up node
+      uses: action/setup-node@v2-beta
+      with:
+        node-version: "12"
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
@@ -49,8 +53,12 @@ jobs:
         bundle install
 
     - name: Build static site
+      run: rake build
+      
+    - name: Test static site
       run: |
-        rake build
+        npm ci
+        npm test
 
     - name: Get Go dependencies
       run: |
