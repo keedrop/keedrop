@@ -5,8 +5,9 @@
   "description": "secure secret dump",
   "main": "keedrop.js",
   "scripts": {
-    "lint": "eslint site/assets/keedrop.js",
-    "test": "npm run cypress",
+    "lint:js": "eslint _site/assets/keedrop.js --fix",
+    "lint:css": "stylelint site/assets/styles.css --fix",
+    "test": "run-p cypress lint:css lint:js",
     "test:dev": "nodemon --exec npm run cypress",
     "cypress:open": "cypress open",
     "cypress": "cypress run"
@@ -26,7 +27,10 @@
     "cypress": "4.5.0",
     "cypress-dotenv": "1.2.1",
     "eslint": "7.0.0",
-    "eslint-plugin-cypress": "2.10.3"
+    "eslint-plugin-cypress": "2.10.3",
+    "npm-run-all": "4.1.5",
+    "stylelint": "13.5.0",
+    "stylelint-config-standard": "20.0.0"
   },
   "dependencies": {
     "dotenv": "8.2.0"

@@ -24,7 +24,11 @@
         </div>
         <nav class="languages">
           {% for lang in unique_languages %}
-            <a rel="alternate" hreflang="{{lang}}" href="/{{lang}}{{page.url}}">{{lang}}</a>
+            {%- if site.lang != lang -%}
+              <a rel="alternate" hreflang="{{lang}}" href="/{{lang}}{{page.url}}">{{lang}}</a>
+            {%- else -%}
+              <span>{{lang}}</span>
+            {%- endif -%}
           {% endfor %}
         </nav>
       </header>
