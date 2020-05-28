@@ -1,5 +1,11 @@
 name: Build
 
+env:
+  KEEDROP_CONTACT_GPGKEY: 0xdeadbead
+  KEEDROP_CONTACT_EMAIL: thedude@dudism.church
+  KEEDROP_CONTACT_ADDRESS: Hollywood
+  KEEDROP_CONTACT_NAME: Jeffrey Lebowski
+
 on:
   push:
     branches: [ master ]
