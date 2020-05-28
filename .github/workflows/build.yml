@@ -40,7 +40,7 @@ jobs:
         ruby-version: "2.7"
       id: ruby
       
-    - name: Check out code into the Go module directory
+    - name: Check out code
       uses: actions/checkout@v2
 
     - name: Set up node
@@ -52,24 +52,25 @@ jobs:
       uses: actions/cache@v2
       with:
         path: vendor/bundle
-        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+        key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock') }}
         restore-keys: |
           ${{ runner.os }}-gems-
       
     - name: Install Ruby dependencies
       run: |
+        sudo apt-get install libpq-dev
         bundle config path vendor/bundle
         bundle install --jobs 4 --retry 3
 
     - name: Build static site
       run: |
         bundle config path vendor/bundle
-        rake build
+        bundle exec rake build
       
     - name: Test static site
       run: |
         bundle config path vendor/bundle
-        rake serve&
+        bundle exec rake serve&
         npm ci
         npm test
 
@@ -81,8 +82,8 @@ jobs:
             dep ensure
         fi
 
-    - name: Build
+    - name: Build server
       run: go build -v .
 
-    - name: Test
+    - name: Test server
       run: go test -v .
