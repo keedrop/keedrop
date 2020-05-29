@@ -10,11 +10,7 @@ context("Create secrets", function () {
   describe("API Server errors", function() {
     before(function() {
       cy.server({ force404: true });
-      cy.route({
-        method: "POST",
-        url: "/api/secret",
-        response: { mnemo: "deadbeadd00de"}
-      });
+
     });
 
     it("API Server not responsive", function() {
