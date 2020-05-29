@@ -1,5 +1,11 @@
 name: Build
 
+env:
+  KEEDROP_CONTACT_GPGKEY: 0xdeadbead
+  KEEDROP_CONTACT_EMAIL: thedude@dudism.church
+  KEEDROP_CONTACT_ADDRESS: Hollywood
+  KEEDROP_CONTACT_NAME: Jeffrey Lebowski
+
 on:
   push:
     branches: [ master ]
@@ -39,18 +45,40 @@ jobs:
       with:
         ruby-version: "2.7"
       id: ruby
-
-    - name: Check out code into the Go module directory
+      
+    - name: Check out code
       uses: actions/checkout@v2
 
+    - name: Set up node
+      uses: actions/setup-node@v2-beta
+      with:
+        node-version: "12"
+
+    - name: Set up bundler
+      uses: actions/cache@v2
+      with:
+        path: vendor/bundle
+        key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-gems-
+      
     - name: Install Ruby dependencies
       run: |
-        gem install bundler
-        bundle install
+        sudo apt-get install libpq-dev
+        bundle config path vendor/bundle
+        bundle install --jobs 4 --retry 3
 
     - name: Build static site
       run: |
-        rake build
+        bundle config path vendor/bundle
+        bundle exec rake build
+      
+    - name: Test static site
+      run: |
+        bundle config path vendor/bundle
+        bundle exec rake serve&
+        npm ci
+        npm test
 
     - name: Get Go dependencies
       run: |
@@ -60,8 +88,8 @@ jobs:
             dep ensure
         fi
 
-    - name: Build
+    - name: Build server
       run: go build -v .
 
-    - name: Test
+    - name: Test server
       run: go test -v .
