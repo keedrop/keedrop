@@ -1,7 +1,7 @@
 name: Build
 
 env:
-  KEEDROP_CONTACT_GPGKEY: 0xdeadbead
+  KEEDROP_CONTACT_GPGKEY: "0xdeadbead"
   KEEDROP_CONTACT_EMAIL: thedude@dudism.church
   KEEDROP_CONTACT_ADDRESS: Hollywood
   KEEDROP_CONTACT_NAME: Jeffrey Lebowski
@@ -58,7 +58,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: vendor/bundle
-        key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock') }}
+        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
         restore-keys: |
           ${{ runner.os }}-gems-
       
