@@ -2,6 +2,11 @@ tagline: Geheimnisse Sicher Versenden
 errors:
   enableJavaScriptButton: Bitte schalten Sie JavaScript ein
   enableJavaScriptText: Kryptographische Operationen werden im Browser durchgeführt und benötigen JavaScript.
+  keyDecodeFail: Der Schlüssel zum Geheimnis konnte nicht korrekt erkannt werden. Prüfen Sie, dass der Link, den Sie angeklickt hatten, komplett ist.
+  noSecretId: Dieser Link sieht irgendwie nicht gültig aus.
+  secretNotFound: Geheimnis konnte nicht geladen werden. Es ist entweder abgelaufen (24 Stunden) oder jemand hat es schon geladen.
+  decryptionFailed: Das Geheimnis konnte nicht entschlüsselt werden.
+  sendFail: Die verschlüsselten Daten konnten nicht zum Speichern übertragen werden.
 headers:
   home: Geheimnisse Sicher Versenden
   imprint: KeeDrop
@@ -22,5 +27,5 @@ imprint:
 result:
   description: Verschicken Sie diesen Link
   copy: Kopieren
-  returnToCopy: EINGABE drücken, um in die Zwischenablage zu kopieren
+  returnToCopy: EINGABE drücken, um den Link in die Zwischenablage zu kopieren
   present: Bitte sehr

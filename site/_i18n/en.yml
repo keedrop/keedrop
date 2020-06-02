@@ -2,6 +2,11 @@ tagline: Transfer Secrets Securely
 errors:
   enableJavaScriptButton: Please enable JavaScript
   enableJavaScriptText: Cryptopgrahy is performed in the browser and for that you need to enable JavaScript.
+  keyDecodeFail: Could not interpret your key. Check that the link you clicked is complete.
+  noSecretId: It looks like someone tampered with your link.
+  secretNotFound: Could not retrieve secret. It has either expired (24h) or someone else already retrieved it.
+  decryptionFailed: Could not decrypt the data.
+  sendFail: Could not connect to server to store encrypted data.
 headers:
   home: Transfer Secrets Securely
   imprint: KeeDrop
@@ -22,5 +27,5 @@ imprint:
 result:
   description: Send this link to the recipient
   copy: Copy
-  returnToCopy: Press RETURN to copy to clipboard
+  returnToCopy: Press RETURN to copy the link to clipboard
   present: Here you are
