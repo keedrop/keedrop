@@ -10,6 +10,13 @@ titles:
   home: Home
   imprint: Imprint
   decrypt: Decrypt
+  humans: Who created this?
+  source:
+    title: Source Code
+    badge: Source Code badge
+  status:
+    title: Status Page
+    badge: Status Page badge
 encrypt:
   label: Secret
   button: Encrypt

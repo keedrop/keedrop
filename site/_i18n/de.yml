@@ -10,6 +10,13 @@ titles:
   home: Homepage
   decrypt: Entschlüsseln
   imprint: Impressum
+  humans: Wer hat das gebaut?
+  source:
+    title: Quellcode
+    badge: Quellcode Plakette
+  status:
+    title: Status Seite
+    badge: Status Seiten Plakette
 encrypt:
   label: Geheimnis
   button: Verschlüsseln
