@@ -23,18 +23,43 @@ context("Create secrets", function () {
 
   describe("Encrypt", function() {
     before(function() {
-      cy.server({ force404: true });
+      cy.server();
       cy.route({
         method: "POST",
-        url: "/api/secret",
-        response: { mnemo: "deadbeadd00de"}
-      });
+        url: "https://keedrop.com/api/secret",
+        response: { mnemo: "deadbead"}
+      }).as("postSecret");
     });
 
     it("API server generates a secret", function() {
       cy.get("#secret").type("Test").should("have.value", "Test");
       cy.contains("Encrypt").click();
       cy.contains("Send this link");
+    });
+
+    it.only("Copy text and encrypt another should reset copy button text", function() {
+      cy.get("#secret").type("Test").should("have.value", "Test");
+      cy.contains("Encrypt").click();
+      cy.wait("@postSecret");
+      // Monkeypatch execCommand("copy") since cypress can't send native events
+      // and copy can be only executed when triggered by native event
+      cy.document().then( doc => {
+        const old = doc.execCommand;
+        doc.execCommand = (commandId, showUI, value) => {
+          if (commandId === "copy") {
+            return true;
+          } else {
+            return old(commandId, showUI, value);
+          }
+        };
+      });
+      cy.get("#copy").click();
+      cy.get("#copy").should("contain", "Copied");
+
+      cy.get("#secret").type("2");
+      cy.contains("Encrypt").click();
+      cy.wait("@postSecret");
+      cy.get("#copy").should("not.contain", "Copied");
     });
 
     it("should submit the form on press of ENTER", function() {

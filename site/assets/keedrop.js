@@ -59,6 +59,7 @@
         source.setSelectionRange(0, 9999);
         callback(document.execCommand("copy"));
       } catch (e) {
+        console.error("Could not copy to clipboard", e)
         callback(false);
       }
     }
@@ -74,7 +75,9 @@
     event.preventDefault && event.preventDefault();
     copyToClipboard(document.getElementById("resultBox"), function(success) {
       if (success) {
-        event.srcElement.innerText = "Copied";
+        var button = event.srcElement;
+        button.setAttribute("data-text", button.innerText);
+        button.innerText = button.getAttribute("data-copied");
       }
     });
     return false;
@@ -96,6 +99,8 @@
   }
 
   function showResult(result) {
+    var copyButton = document.getElementById("copy")
+    copyButton.innerText = copyButton.getAttribute("data-text") || copyButton.innerText
     var resultBox = document.getElementById("resultBox");
     resultBox.value = result;
     resultBox.parentNode.parentNode.parentNode.classList.add("reveal");
