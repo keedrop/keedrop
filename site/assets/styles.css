@@ -4,6 +4,10 @@ body {
   height: 100%;
 }
 
+a {
+  color: black;
+}
+
 .container {
   text-align: center;
   max-width: 100vw;
@@ -102,7 +106,7 @@ nav a img {
   vertical-align: middle;
 }
 
-nav a[href$=imprint] {
+nav a {
   text-transform: lowercase;
 }
 
@@ -131,10 +135,6 @@ input[type="text"]:focus {
 
 #resultBox:focus ~ .returnToCopy {
   display: block;
-}
-
-a {
-  color: black;
 }
 
 a.button,
