@@ -1,4 +1,7 @@
-tagline: Geheimnisse Sicher Versenden
+site:
+  description: Verschlüsselte Passwörter, Geheimnisse und sensible Daten sicher als einmalig entschlüsselbaren Link in E-Mails & Chats versenden
+  keywords: passwort, passwörter, geheimnisse, sicher, versenden, email, e-mail, messenger, verschlüsselt
+  tagline: Geheimnisse Sicher Versenden
 errors:
   enableJavaScriptButton: Bitte schalten Sie JavaScript ein
   enableJavaScriptText: Kryptographische Operationen werden im Browser durchgeführt und benötigen JavaScript.
@@ -8,11 +11,10 @@ errors:
   decryptionFailed: Das Geheimnis konnte nicht entschlüsselt werden.
   sendFail: Die verschlüsselten Daten konnten nicht zum Speichern übertragen werden.
 headers:
-  home: Geheimnisse Sicher Versenden
   imprint: KeeDrop
   decrypt: Jemand hat Ihnen ein Geheimnis geschickt
 titles:
-  home: Homepage
+  home: Verschüsselten sicheren Link erstellen
   decrypt: Entschlüsseln
   imprint: Impressum
   humans: Wer hat das gebaut?

@@ -1,7 +1,7 @@
 context("Imprint page", function () {
   describe("common infos on all imprint pages", function() {
     [
-      "/de/imprint",
+      "/de/impressum",
       "/imprint"
     ].forEach(url => {
       it("contains the GPG key on " + url, function() {
@@ -13,7 +13,7 @@ context("Imprint page", function () {
 
   describe("region specific informations", function() {
     it("should have required infos on German page", function() {
-      cy.visit("/de/imprint/");
+      cy.visit("/de/impressum/");
       cy.contains("Anbieter im Sinne des TDG/MDStV:").should("exist");
     });
 

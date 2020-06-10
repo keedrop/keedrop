@@ -1,4 +1,7 @@
-tagline: Transfer Secrets Securely
+site:
+  description: Encrypt passwords, sensitive data or secrets in a secure way as one time disposable link
+  keywords: password, secure, link, sending, send, email, messenger, private, disposable
+  tagline: Transfer Secrets Securely
 errors:
   enableJavaScriptButton: Please enable JavaScript
   enableJavaScriptText: Cryptopgrahy is performed in the browser and for that you need to enable JavaScript.
@@ -12,9 +15,9 @@ headers:
   imprint: KeeDrop
   decrypt: Someone sent you a secret
 titles:
-  home: Home
+  home: Create encrypted secure link
+  decrypt: Decrypt secure link
   imprint: Imprint
-  decrypt: Decrypt
   humans: Who created this?
   source:
     title: Source Code
