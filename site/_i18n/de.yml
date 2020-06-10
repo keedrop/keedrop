@@ -1,3 +1,5 @@
+site:
+  description: Verschlüsselte Passwörter, Geheimnisse und sensible Daten sicher als einmalig entschlüsselbaren Link in E-Mails & Chats versenden
 tagline: Geheimnisse Sicher Versenden
 errors:
   enableJavaScriptButton: Bitte schalten Sie JavaScript ein

@@ -1,3 +1,5 @@
+site:
+  description: Encrypt passwords, sensitive data or secrets in a secure way as one time disposable link
 tagline: Transfer Secrets Securely
 errors:
   enableJavaScriptButton: Please enable JavaScript
