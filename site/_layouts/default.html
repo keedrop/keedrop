@@ -3,7 +3,13 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="{{site.description}}">
+    <title>{{ site.title }} | {% t page.title %}</title>
+    {%- if page.description -%}
+      <meta name="description" content="{% t page.description %}">
+    {%- else -%}
+      <meta name="description" content="{% t site.description %}">
+    {%- endif -%}
+    <meta name="keywords" content="{% t site.keywords %}">
     <meta name="author" content="Marcus Ilgner">
     <meta http-equiv="Content-Security-Policy" content="script-src 'self';img-src 'self' img.shields.io;style-src 'unsafe-inline' 'self';">
     <meta http-equiv="Content-Language" content="{{site.lang}}">
@@ -11,10 +17,9 @@
     {% for lang in unique_languages %}
       <link rel="alternate" hreflang="{{lang}}" href="/{{lang}}{{page.url}}">
     {% endfor %}
-    <title>KeeDrop: {% t tagline %} | {% t page.title %}</title>
-    <link rel="author" href="/humans.txt">
     <link href="/assets/milligram.min.css" rel="stylesheet" type="text/css">
     <link href="/assets/styles.css" rel="stylesheet" type="text/css">
+    <link rel="author" href="/humans.txt">
   </head>
   <body>
     <div class="container">
