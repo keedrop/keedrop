@@ -36,5 +36,6 @@ imprint:
 result:
   description: Verschicken Sie diesen Link
   copy: Kopieren
+  copied: Kopiert
   returnToCopy: EINGABE drücken, um den Link in die Zwischenablage zu kopieren
   present: Bitte sehr

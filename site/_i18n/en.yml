@@ -37,5 +37,6 @@ imprint:
 result:
   description: Send this link to the recipient
   copy: Copy
+  copied: Copied!
   returnToCopy: Press RETURN to copy the link to clipboard
   present: Here you are
