@@ -8,7 +8,7 @@
     "EditorConfig.EditorConfig",
     "humao.rest-client",
     "mikestead.dotenv",
-    "ms-vscode.Go",
+    "golang.go",
     "dbaeumer.vscode-eslint",
     "eamodio.gitlens",
     "misogi.ruby-rubocop",
