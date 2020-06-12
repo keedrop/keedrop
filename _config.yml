@@ -5,7 +5,7 @@ url: "https://keedrop.com" # the base hostname & protocol for your site, e.g. ht
 permalink: pretty
 host: 0.0.0.0
 
-languages: ["en", "en", "de", "ru"]
+languages: ["en", "de", "ru"]
 exclude_from_localizations: ["assets", "humans.txt", "robots.txt", "sitemap_index.xml"]
 
 # Build settings
