@@ -11,7 +11,7 @@
     {%- endif -%}
     <meta name="keywords" content="{% t site.keywords %}">
     <meta name="author" content="Marcus Ilgner">
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self';img-src 'self' img.shields.io;style-src 'unsafe-inline' 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' img.shields.io; font-src 'self' data:; connect-src 'self' keedrop.com cors-anywhere.herokuapp.com; form-action 'self'; base-uri 'self'">
     <meta http-equiv="Content-Language" content="{{site.lang}}">
     {% assign unique_languages = site.languages | uniq %}
     {% for lang in unique_languages %}
