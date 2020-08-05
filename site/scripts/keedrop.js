@@ -178,17 +178,21 @@
 
   function initReadPage() {
     var button = document.querySelector("button:disabled");
-    button.disabled = false;
-    button.onclick = onDecryptClicked;
-  // Don't lose the hash part when switching languages ;)
-  Array.prototype.forEach.call(document.querySelectorAll(".languages a"), function(link) {
-    link.href = link.href + location.hash;
-  });
+    if (button) {
+      button.disabled = false;
+      button.onclick = onDecryptClicked;
+    }
+    // Don't lose the hash part when switching languages ;)
+    Array.prototype.forEach.call(document.querySelectorAll(".languages a"), function(link) {
+      link.href = link.href + location.hash;
+    });
   }
 
   function initStorePage() {
     var button = document.querySelector("button:disabled");
-    button.disabled = false;
+    if (button) {
+      button.disabled = false;
+    }
     var form = document.getElementById("storeForm");
     form.onsubmit = onEncryptSubmit;
   }
