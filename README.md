@@ -2,7 +2,6 @@
 ![Build](https://github.com/milgner/keedrop/workflows/Build/badge.svg)
 ![Uptime Ratio](https://img.shields.io/uptimerobot/ratio/m785003856-8aa9823b6992a1796824c5a6)
 [![Maintainability](https://api.codeclimate.com/v1/badges/84247dcbbb258baa2cf0/maintainability)](https://codeclimate.com/github/milgner/keedrop/maintainability)
-![Chat](https://img.shields.io/matrix/keedrop:matrix.illunis.net)
 
 # KeeDrop - securely send passwords
 
