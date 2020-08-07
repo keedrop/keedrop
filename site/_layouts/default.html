@@ -14,7 +14,7 @@
     <meta http-equiv="Content-Language" content="{{site.lang}}">
     {% assign unique_languages = site.languages | uniq %}
     {% for lang in unique_languages %}
-      <link rel="alternate" hreflang="{{lang}}" href="/{{lang}}{{page.url}}">
+      <link rel="alternate" hreflang="{{lang}}" href="{% tl {{page.namespace}} {{lang}} %}">
     {% endfor %}
     <link href="/assets/milligram.min.css" rel="stylesheet" type="text/css">
     <link href="/assets/styles.css" rel="stylesheet" type="text/css">
@@ -29,7 +29,7 @@
         <nav class="languages">
           {% for lang in unique_languages %}
             {%- if site.lang != lang -%}
-              <a rel="alternate" hreflang="{{lang}}" href="/{{lang}}{{page.url}}">{{lang}}</a>
+              <a rel="alternate" hreflang="{{lang}}" href="{% tl {{page.namespace}} {{lang}} %}">{{lang}}</a>
             {%- else -%}
               <span>{{lang}}</span>
             {%- endif -%}
