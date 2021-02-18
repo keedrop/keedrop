@@ -5,6 +5,7 @@ env:
   KEEDROP_CONTACT_EMAIL: thedude@dudism.church
   KEEDROP_CONTACT_ADDRESS: Hollywood
   KEEDROP_CONTACT_NAME: Jeffrey Lebowski
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
 on:
   push:
