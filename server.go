@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"github.com/dchest/uniuri"
 	"github.com/fvbock/endless"
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
-        "github.com/gin-contrib/static"
 	"github.com/mediocregopher/radix/v3"
 	"github.com/op/go-logging"
+	cors "github.com/rs/cors/wrapper/gin"
 	"net/http"
 	"os"
 )
@@ -22,6 +23,10 @@ const (
 )
 
 var logger = logging.MustGetLogger("keedrop")
+var corsOptions = cors.Options{
+	AllowedOrigins: []string{"https://keedrop.com", "https://www.keedrop.com", "https://keedrop.de", "https://www.keedrop.de", "https://keedrop.me", "https://www.keedrop.me", "https://keedrop.link", "https://www.keedrop.link"},
+	AllowedHeaders: []string{"Content-Type"},
+}
 
 // structure to store the secret in Redis
 // only the secret key remains with the sender
@@ -165,6 +170,8 @@ func setupRouter(redis *radix.Pool) *gin.Engine {
 	router := gin.Default()
 
 	router.Use(static.Serve("/", static.LocalFile("./_site", true)))
+
+	router.Use(cors.New(corsOptions))
 
 	router.POST("/api/secret", wrapHandler(redis, storeSecret))
 	router.GET("/api/secret/:mnemo", wrapHandler(redis, retrieveSecret))
