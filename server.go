@@ -24,10 +24,13 @@ const (
 )
 
 var logger = logging.MustGetLogger("keedrop")
-var corsConfig = cors.Config{
-	AllowOrigins: getCorsOrigins(),
-	AllowMethods: []string{"POST", "GET"},
-	AllowHeaders: []string{"Content-Type"},
+
+func corsConfig() cors.Config {
+	return cors.Config{
+		AllowOrigins: getCorsOrigins(),
+		AllowMethods: []string{"POST", "GET"},
+		AllowHeaders: []string{"Content-Type"},
+	}
 }
 
 func mapSlice(src []string, f func(string) string) []string {
@@ -190,7 +193,7 @@ func setupRouter(redis *radix.Pool) *gin.Engine {
 
 	router.Use(static.Serve("/", static.LocalFile("./_site", true)))
 
-	router.Use(cors.New(corsConfig))
+	router.Use(cors.New(corsConfig()))
 
 	router.POST("/api/secret", wrapHandler(redis, storeSecret))
 	router.GET("/api/secret/:mnemo", wrapHandler(redis, retrieveSecret))
