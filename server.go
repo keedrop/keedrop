@@ -5,12 +5,14 @@ import (
 	"encoding/json"
 	"github.com/dchest/uniuri"
 	"github.com/fvbock/endless"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
-        "github.com/gin-contrib/static"
 	"github.com/mediocregopher/radix/v3"
 	"github.com/op/go-logging"
 	"net/http"
 	"os"
+	"strings"
 )
 
 const (
@@ -22,6 +24,31 @@ const (
 )
 
 var logger = logging.MustGetLogger("keedrop")
+
+func corsConfig() cors.Config {
+	return cors.Config{
+		AllowOrigins: getCorsOrigins(),
+		AllowMethods: []string{"POST", "GET"},
+		AllowHeaders: []string{"Content-Type"},
+	}
+}
+
+func mapSlice(src []string, f func(string) string) []string {
+	mapped := make([]string, len(src))
+	for i, v := range src {
+		mapped[i] = f(v)
+	}
+	return mapped
+}
+
+func getCorsOrigins() []string {
+	origins := os.Getenv("KEEDROP_CORS_ORIGINS")
+	if len(origins) == 0 {
+		return []string{"*"}
+	}
+	sliced := strings.Split(origins, ",")
+	return mapSlice(sliced, strings.TrimSpace)
+}
 
 // structure to store the secret in Redis
 // only the secret key remains with the sender
@@ -165,6 +192,8 @@ func setupRouter(redis *radix.Pool) *gin.Engine {
 	router := gin.Default()
 
 	router.Use(static.Serve("/", static.LocalFile("./_site", true)))
+
+	router.Use(cors.New(corsConfig()))
 
 	router.POST("/api/secret", wrapHandler(redis, storeSecret))
 	router.GET("/api/secret/:mnemo", wrapHandler(redis, retrieveSecret))
