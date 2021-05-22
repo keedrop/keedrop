@@ -12,7 +12,7 @@
     "cypress:open": "cypress open",
     "cypress": "wait-for-localhost 4000 && cypress run"
   },
-  "repository": "milgner/keedrop",
+  "repository": "keedrop/keedrop",
   "keywords": [
     "secret",
     "password",
@@ -29,9 +29,9 @@
     "eslint": "7.0.0",
     "eslint-plugin-cypress": "2.10.3",
     "npm-run-all": "4.1.5",
-    "stylelint": "13.5.0",
+    "stylelint": "13.13.1",
     "stylelint-config-standard": "20.0.0",
-    "wait-for-localhost-cli": "1.1.0"
+    "wait-for-localhost-cli": "2.0.0"
   },
   "dependencies": {
     "dotenv": "8.2.0"

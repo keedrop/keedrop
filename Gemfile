@@ -11,7 +11,8 @@ install_if -> { RUBY_PLATFORM =~ %r!mingw|mswin|java! } do
 end
 
 group :development do
-  gem 'pry', '~> 0.12.2'
+  gem 'webrick'
+  gem 'pry', '~> 0.14.1'
   gem 'pry-byebug'
 end
 
@@ -23,7 +24,7 @@ end
 #
 # This will help ensure the proper Jekyll version is running.
 # Happy Jekylling!
-gem 'jekyll', '~> 4.0.0'
+gem 'jekyll', '~> 4.2.0'
 
 # Use rake as a build system
 gem 'rake'
