@@ -12,6 +12,7 @@ import (
 	"github.com/op/go-logging"
 	"net/http"
 	"os"
+	"time"
 	"strings"
 )
 
@@ -30,6 +31,7 @@ func corsConfig() cors.Config {
 		AllowOrigins: getCorsOrigins(),
 		AllowMethods: []string{"POST", "GET"},
 		AllowHeaders: []string{"Content-Type"},
+		MaxAge: 12 * time.Hour,
 	}
 }
 
