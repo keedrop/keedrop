@@ -5,13 +5,14 @@ import (
 	"encoding/json"
 	"github.com/dchest/uniuri"
 	"github.com/fvbock/endless"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/mediocregopher/radix/v3"
 	"github.com/op/go-logging"
-	cors "github.com/rs/cors/wrapper/gin"
 	"net/http"
 	"os"
+	"time"
 )
 
 const (
@@ -23,9 +24,12 @@ const (
 )
 
 var logger = logging.MustGetLogger("keedrop")
-var corsOptions = cors.Options{
-	AllowedOrigins: []string{"https://keedrop.com", "https://www.keedrop.com", "https://keedrop.de", "https://www.keedrop.de", "https://keedrop.me", "https://www.keedrop.me", "https://keedrop.link", "https://www.keedrop.link"},
-	AllowedHeaders: []string{"Content-Type"},
+var corsConfig = cors.Config{
+	AllowHeaders: []string{"Content-Type"},
+	AllowMethods: []string{"POST", "GET"},
+	AllowOrigins: []string{"https://keedrop.com", "https://www.keedrop.com", "https://keedrop.de", "https://www.keedrop.de", "https://keedrop.me", "https://www.keedrop.me", "https://keedrop.link", "https://www.keedrop.link"},
+	// ExposeHeaders: []string{"Content-Type"},
+	MaxAge: 12 * time.Hour,
 }
 
 // structure to store the secret in Redis
@@ -171,7 +175,7 @@ func setupRouter(redis *radix.Pool) *gin.Engine {
 
 	router.Use(static.Serve("/", static.LocalFile("./_site", true)))
 
-	router.Use(cors.New(corsOptions))
+	router.Use(cors.New(corsConfig))
 
 	router.POST("/api/secret", wrapHandler(redis, storeSecret))
 	router.GET("/api/secret/:mnemo", wrapHandler(redis, retrieveSecret))
