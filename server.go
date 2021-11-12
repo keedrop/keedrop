@@ -195,7 +195,9 @@ func setupRouter(redis *radix.Pool) *gin.Engine {
 
 	router.Use(static.Serve("/", static.LocalFile("./_site", true)))
 
-	router.Use(cors.New(corsConfig()))
+	if len(getCorsOrigins()) > 0 {
+		router.Use(cors.New(corsConfig()))
+	}
 
 	router.POST("/api/secret", wrapHandler(redis, storeSecret))
 	router.GET("/api/secret/:mnemo", wrapHandler(redis, retrieveSecret))
