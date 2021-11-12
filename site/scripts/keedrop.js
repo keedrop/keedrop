@@ -29,12 +29,12 @@
         request(baseUrl, JSON.stringify(data), callback);
       },
       get: function(mnemo, callback) {
-        request(baseUrl + mnemo, undefined, callback);
+        request(baseUrl + "/" + mnemo, undefined, callback);
       }
     };
   }
 
-  var api = defaultAdapter("{{site.env.KEEDROP_API_PREFIX}}https://keedrop.com/api/secret/");
+  var api = defaultAdapter("{{site.env.KEEDROP_API_PREFIX}}https://keedrop.com/api/secret");
 
   function transferEncode(value) {
     return window.nacl.util.encodeBase64(value).replace(/\//g, "!");
