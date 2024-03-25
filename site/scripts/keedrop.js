@@ -73,7 +73,7 @@
 
   function onCopyClick(event) {
     event.preventDefault && event.preventDefault();
-    copyToClipboard(document.getElementById("resultBox"), function(success) {
+    copyToClipboard(document.getElementById("result-box"), function(success) {
       if (success) {
         var button = event.srcElement;
         button.setAttribute("data-text", button.innerText);
@@ -101,7 +101,7 @@
   function showResult(result) {
     var copyButton = document.getElementById("copy")
     copyButton.innerText = copyButton.getAttribute("data-text") || copyButton.innerText
-    var resultBox = document.getElementById("resultBox");
+    var resultBox = document.getElementById("result-box");
     resultBox.value = result;
     resultBox.parentNode.parentNode.parentNode.classList.add("reveal");
     resultBox.focus();
@@ -122,7 +122,7 @@
 
     hideError();
 
-    var resultBox = document.getElementById("resultBox");
+    var resultBox = document.getElementById("result-box");
     resultBox.value = "";
     var button = form.querySelector("button");
     button.disabled = true;
@@ -193,7 +193,7 @@
     if (button) {
       button.disabled = false;
     }
-    var form = document.getElementById("storeForm");
+    var form = document.getElementById("store-form");
     form.onsubmit = onEncryptSubmit;
   }
 

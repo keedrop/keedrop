@@ -30,7 +30,7 @@ header .languages {
 }
 
 .row.secret-link {
-  background-color: rgb(219, 187, 145);
+  background-color: rgb(219 187 145);
   padding: 2em 0;
 }
 
@@ -123,17 +123,17 @@ input[type="text"]:focus {
   max-width: 300px;
 }
 
-#resultBox {
+#result-box {
   max-width: 650px;
   color: gray;
   background-color: white;
 }
 
-.returnToCopy {
+.return-to-copy {
   display: none;
 }
 
-#resultBox:focus ~ .returnToCopy {
+#result-box:focus ~ .return-to-copy {
   display: block;
 }
 
