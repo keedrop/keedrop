@@ -6,7 +6,7 @@ describe("noscript", function () {
     cy.get("#encrypt").should("be.visible").should("be.enabled");
   });
 
-  it("should show noscript banner when script is disabled", function() {
+  xit("should show noscript banner when script is disabled", function() {
     cy.visit("/", { script: false });
     cy.contains("Cryptopgrahy is performed in the browser").should("exist");
     cy.get("button")

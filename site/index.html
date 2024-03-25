@@ -13,7 +13,7 @@ permalink: /
 <div class="row error animate-show"></div>
 <div class="row content">
   <div class="column">
-    <form id="storeForm">
+    <form id="store-form">
       <label for="secret">{% t encrypt.label %}:</label>
       <input id="secret" name="secret" type="text" required autofocus/>
       {% capture text %}{% t encrypt.button %}{% endcapture %}
@@ -24,9 +24,9 @@ permalink: /
 <div class="row secret-link animate-show">
   <div class="column">
     <form>
-      <label for="resultBox">{% t result.description %}:</label>
-      <input id="resultBox" type="text" readonly/><button id="copy" data-copied="{% t result.copied %}">{% t result.copy %}</button>
-      <div class="returnToCopy">({% t result.returnToCopy %})</div>
+      <label for="result-box">{% t result.description %}:</label>
+      <input id="result-box" type="text" readonly/><button id="copy" data-copied="{% t result.copied %}">{% t result.copy %}</button>
+      <div class="return-to-copy">({% t result.returnToCopy %})</div>
     </form>
   </div>
 </div>
