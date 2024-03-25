@@ -9,7 +9,7 @@ context("Create secrets", function () {
 
   describe("API Server errors", function() {
     before(function() {
-      cy.server({ force404: true });
+      cy.intercept({ force404: true });
 
     });
 
@@ -23,12 +23,7 @@ context("Create secrets", function () {
 
   describe("Encrypt", function() {
     before(function() {
-      cy.server();
-      cy.route({
-        method: "POST",
-        url: "https://keedrop.com/api/secret",
-        response: { mnemo: "deadbead"}
-      }).as("postSecret");
+      cy.intercept("https://keedrop.com/api/secret",  { mnemo: "deadbead" }).as("postSecret");
     });
 
     it("API server generates a secret", function() {
@@ -54,12 +49,12 @@ context("Create secrets", function () {
         };
       });
       cy.get("#copy").click();
-      cy.get("#copy").should("contain", "Copied");
+      cy.get("#copy").should("contain", "Copied!");
 
       cy.get("#secret").type("2");
       cy.contains("Encrypt").click();
       cy.wait("@postSecret");
-      cy.get("#copy").should("not.contain", "Copied");
+      cy.get("#copy").should("not.contain", "Copied!");
     });
 
     it("should submit the form on press of ENTER", function() {
