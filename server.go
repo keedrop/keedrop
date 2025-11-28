@@ -202,6 +202,18 @@ func setupRouter(redis *radix.Pool) *gin.Engine {
 	router.POST("/api/secret", wrapHandler(redis, storeSecret))
 	router.GET("/api/secret/:mnemo", wrapHandler(redis, retrieveSecret))
 
+  router.NoRoute(func(c *gin.Context) {
+    path := strings.TrimSuffix(c.Request.URL.Path, "/")
+    htmlPath := "./_site" + path + ".html"
+
+    if _, err := os.Stat(htmlPath); err == nil {
+      c.File(htmlPath)
+      return
+    }
+
+    c.Status(404)
+  })
+
 	return router
 }
 
