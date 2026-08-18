@@ -37,7 +37,7 @@ jobs:
     steps:
 
     - name: Set up Go 1.x
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v7
       with:
         go-version: ^1.22
       id: go
@@ -50,10 +50,10 @@ jobs:
       id: ruby
 
     - name: Check out code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
 
     - name: Set up node
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v7
       with:
         node-version: "25"
 
@@ -64,7 +64,7 @@ jobs:
         bundle install --jobs 4 --retry 3
 
     - name: Run E2E tests
-      uses: cypress-io/github-action@v6
+      uses: cypress-io/github-action@v7
       with:
         start: bundle exec rake serve
 
