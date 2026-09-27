@@ -19,6 +19,8 @@ with key verification.
 - Automatically expunge data after 24h
 - Alternatively, data is deleted on retrieval
 - Doesn't track you with analytics
+- The API rejects request bodies over 64 KB, which leaves room for about 46 KB of secret text
+- API requests are rate-limited per IP, and neither IPs nor secret IDs are written to the request log
 
 ## What it cannot defend against:
 
@@ -35,3 +37,13 @@ with key verification.
 |`KEEDROP_CONTACT_ADDRESS`|yes|Quoted new-line delimited address info|
 |`KEEDROP_CONTACT_EMAIL`|yes|Email for contact|
 |`KEEDROP_CONTACT_GPGKEY`|no|GPG key|
+
+The API server reads these:
+
+| name | required | value |
+|------|----------|-------|
+|`KEEDROP_REDIS`|no|Redis connection string, defaults to `redis://localhost:6379/0`|
+|`KEEDROP_PORT`|no|Listen address, defaults to `:8080`|
+|`KEEDROP_CORS_ORIGINS`|no|Comma-separated origins allowed to call the API from another domain. CORS is off when unset, since the site calls the API on its own domain|
+|`KEEDROP_RATE_LIMIT`|no|API requests per minute and client IP, defaults to `60`, `0` disables it|
+|`KEEDROP_TRUSTED_PROXIES`|no|Comma-separated IPs or CIDRs of reverse proxies allowed to set `X-Forwarded-For`, defaults to `127.0.0.1,::1`|

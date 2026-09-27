@@ -3,6 +3,8 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"github.com/dchest/uniuri"
 	"github.com/fvbock/endless"
 	"github.com/gin-contrib/cors"
@@ -18,6 +20,7 @@ import (
 
 const (
 	mnemoLen                = 10
+	maxRequestBodyBytes     = 64 * 1024
 	defaultLifetime         = 60 * 60 * 24
 	maxMnemoFindTries       = 10
 	secretsStoredCounter    = "KeeDropStoredKeysCounter"
@@ -43,10 +46,11 @@ func mapSlice(src []string, f func(string) string) []string {
 	return mapped
 }
 
+// the site calls the API on its own origin, so CORS is off unless origins are configured
 func getCorsOrigins() []string {
 	origins := os.Getenv("KEEDROP_CORS_ORIGINS")
 	if len(origins) == 0 {
-		return []string{"*"}
+		return nil
 	}
 	sliced := strings.Split(origins, ",")
 	return mapSlice(sliced, strings.TrimSpace)
@@ -129,7 +133,7 @@ func loadFromRedis(redis *radix.Pool, mnemo string) (*secretData, bool) {
 			increaseCounter(redis, secretsRetrievedCounter)
 			return secret, true
 		} else {
-			logger.Error("Could not unmarshal JSON data: ", encodedData)
+			logger.Error("Could not unmarshal secret JSON data:", err)
 			return nil, false
 		}
 	}
@@ -141,7 +145,10 @@ type redisUsingGinHandler func(*radix.Pool, *gin.Context)
 // POST /api/secret
 func storeSecret(redis *radix.Pool, ctx *gin.Context) {
 	var secret secretData
-	if ctx.BindJSON(&secret) == nil {
+	var tooLarge *http.MaxBytesError
+	if err := ctx.ShouldBindJSON(&secret); errors.As(err, &tooLarge) {
+		ctx.JSON(http.StatusRequestEntityTooLarge, gin.H{"error": "Secret too large"})
+	} else if err == nil {
 		if mnemo, ok := saveInRedis(redis, &secret); ok {
 			ctx.JSON(http.StatusOK, gin.H{"mnemo": mnemo})
 		} else {
@@ -155,7 +162,6 @@ func storeSecret(redis *radix.Pool, ctx *gin.Context) {
 // GET /api/secret/:mnemo
 func retrieveSecret(redis *radix.Pool, ctx *gin.Context) {
 	mnemo := ctx.Param("mnemo")
-	logger.Debug("Reading data for mnemo:", mnemo)
 	if secret, ok := loadFromRedis(redis, mnemo); !ok {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Could not read secret"})
 	} else {
@@ -190,8 +196,44 @@ func listenPort() string {
 	}
 }
 
+// only proxies listed here may set X-Forwarded-For, so clients can't spoof their IP
+func trustedProxies() []string {
+	if proxies := os.Getenv("KEEDROP_TRUSTED_PROXIES"); len(proxies) > 0 {
+		return mapSlice(strings.Split(proxies, ","), strings.TrimSpace)
+	}
+	return []string{"127.0.0.1", "::1"}
+}
+
+// rejects request bodies larger than maxRequestBodyBytes
+func limitRequestBody(ctx *gin.Context) {
+	ctx.Request.Body = http.MaxBytesReader(ctx.Writer, ctx.Request.Body, maxRequestBodyBytes)
+	ctx.Next()
+}
+
+// like Gin's default request log, but without client IPs and with the
+// route pattern instead of the path, so secret mnemos never end up in logs
+func requestLogger() gin.HandlerFunc {
+	return gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
+		path := param.Path
+		if strings.HasPrefix(path, "/api/secret/") {
+			path = "/api/secret/:mnemo"
+		}
+		return fmt.Sprintf("[GIN] %v | %3d | %13v | %-7s %#v\n",
+			param.TimeStamp.Format("2006/01/02 - 15:04:05"),
+			param.StatusCode,
+			param.Latency,
+			param.Method,
+			path,
+		)
+	})
+}
+
 func setupRouter(redis *radix.Pool) *gin.Engine {
-	router := gin.Default()
+	router := gin.New()
+	router.Use(requestLogger(), gin.Recovery())
+	if err := router.SetTrustedProxies(trustedProxies()); err != nil {
+		logger.Fatal("Invalid KEEDROP_TRUSTED_PROXIES:", err)
+	}
 
 	router.Use(static.Serve("/", static.LocalFile("./_site", true)))
 
@@ -199,8 +241,12 @@ func setupRouter(redis *radix.Pool) *gin.Engine {
 		router.Use(cors.New(corsConfig()))
 	}
 
-	router.POST("/api/secret", wrapHandler(redis, storeSecret))
-	router.GET("/api/secret/:mnemo", wrapHandler(redis, retrieveSecret))
+	api := router.Group("/api")
+	if limit := rateLimit(); limit > 0 {
+		api.Use(newRateLimiter(limit).middleware())
+	}
+	api.POST("/secret", limitRequestBody, wrapHandler(redis, storeSecret))
+	api.GET("/secret/:mnemo", wrapHandler(redis, retrieveSecret))
 
   router.NoRoute(func(c *gin.Context) {
     path := strings.TrimSuffix(c.Request.URL.Path, "/")
