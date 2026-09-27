@@ -115,7 +115,7 @@
     event.preventDefault && event.preventDefault();
 
     var form = event.currentTarget;
-    var secret = window.nacl.util.decodeUTF8(form.elements.secret.value);
+    var secret = window.nacl.util.decodeUTF8(document.getElementById("secret").value);
     var keyPair = window.nacl.box.keyPair();
     var nonce = window.nacl.randomBytes(window.nacl.box.nonceLength);
     var encrypted = window.nacl.box(secret, nonce, keyPair.publicKey, keyPair.secretKey);
@@ -189,12 +189,12 @@
   }
 
   function initStorePage() {
-    var button = document.querySelector("button:disabled");
-    if (button) {
-      button.disabled = false;
-    }
+    // Attach the handler before enabling the button so the form can never be
+    // submitted natively (which would put the secret into the URL)
     var form = document.getElementById("store-form");
     form.onsubmit = onEncryptSubmit;
+    var button = document.getElementById("encrypt");
+    button.disabled = false;
   }
 
   window.addEventListener("click", function(event) {

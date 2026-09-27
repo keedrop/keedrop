@@ -13,9 +13,9 @@ permalink: /
 <div class="row error animate-show"></div>
 <div class="row content">
   <div class="column">
-    <form id="store-form">
+    <form id="store-form" autocomplete="off">
       <label for="secret">{% t encrypt.label %}:</label>
-      <input id="secret" name="secret" type="text" required autofocus/>
+      <input id="secret" type="text" autocomplete="off" required autofocus/>
       {% capture text %}{% t encrypt.button %}{% endcapture %}
       {% include submitButton.html id="encrypt" text=text %}
     </form>

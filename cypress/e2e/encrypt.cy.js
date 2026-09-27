@@ -7,10 +7,24 @@ context("Create secrets", function () {
     cy.contains("Cryptopgrahy is performed in the browser").not();
   });
 
-  describe("API Server errors", function() {
-    before(function() {
-      cy.intercept({ force404: true });
+  it("Never serializes the secret into a native form submission", function() {
+    cy.get("#secret").should("not.have.attr", "name");
+  });
 
+  it("Does not leak the secret into the URL when the form is submitted natively", function() {
+    cy.get("#secret").type("hunter2");
+    // form.submit() bypasses the onsubmit handler, just like a submit before
+    // keedrop.js has loaded
+    cy.get("#store-form").then(function($form) {
+      $form[0].submit();
+    });
+    // A native GET submit always navigates to a URL with a "?", wait for it
+    cy.location("href").should("include", "?").and("not.contain", "hunter2");
+  });
+
+  describe("API Server errors", function() {
+    beforeEach(function() {
+      cy.intercept("https://keedrop.com/api/secret", { forceNetworkError: true });
     });
 
     it("API Server not responsive", function() {
@@ -22,8 +36,8 @@ context("Create secrets", function () {
   });
 
   describe("Encrypt", function() {
-    before(function() {
-      cy.intercept("https://keedrop.com/api/secret",  { mnemo: "deadbead" }).as("postSecret");
+    beforeEach(function() {
+      cy.intercept("https://keedrop.com/api/secret", { mnemo: "deadbead" }).as("postSecret");
     });
 
     it("API server generates a secret", function() {
@@ -32,7 +46,7 @@ context("Create secrets", function () {
       cy.contains("Send this link");
     });
 
-    it.only("Copy text and encrypt another should reset copy button text", function() {
+    it("Copy text and encrypt another should reset copy button text", function() {
       cy.get("#secret").type("Test").should("have.value", "Test");
       cy.contains("Encrypt").click();
       cy.wait("@postSecret");
