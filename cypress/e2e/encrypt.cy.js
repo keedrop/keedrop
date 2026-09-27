@@ -107,6 +107,23 @@ context("Create secrets", function () {
       cy.get("#copy").should("not.contain", "Copied!");
     });
 
+    it("Does not shift the layout when the link box loses focus", function() {
+      // Pressing the copy button blurs the link box first. If that moves the
+      // content, the click can land somewhere else and nothing gets copied.
+      cy.get("#secret").type("Test{enter}");
+      cy.wait("@postSecret");
+      cy.get("#result-box").should("have.focus");
+      cy.get("#copy").then(function($copy) {
+        const before = $copy[0].getBoundingClientRect();
+        const pageHeight = $copy[0].ownerDocument.documentElement.scrollHeight;
+        cy.get("#result-box").blur();
+        cy.get("#copy").should(function($after) {
+          expect($after[0].getBoundingClientRect().top, "copy button position").to.eq(before.top);
+          expect($after[0].ownerDocument.documentElement.scrollHeight, "page height").to.eq(pageHeight);
+        });
+      });
+    });
+
     it("should submit the form on press of ENTER", function() {
       cy.get("#secret").type("Test{enter}");
       cy.contains("Send this link");
