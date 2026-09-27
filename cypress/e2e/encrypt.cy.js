@@ -58,6 +58,13 @@ context("Create secrets", function () {
       cy.get("#secret").type("Test").should("have.value", "Test");
       cy.contains("Encrypt").click();
       cy.wait("@postSecret");
+      // The Clipboard API rejects unless the window is focused, which headless
+      // CI runs do not guarantee, so make copying deterministic
+      cy.window().then(win => {
+        if (win.navigator.clipboard) {
+          cy.stub(win.navigator.clipboard, "writeText").resolves();
+        }
+      });
       // Monkeypatch execCommand("copy") since cypress can't send native events
       // and copy can be only executed when triggered by native event
       cy.document().then( doc => {
