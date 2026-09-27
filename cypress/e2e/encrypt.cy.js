@@ -23,9 +23,8 @@ context("Create secrets", function () {
   });
 
   describe("API Server errors", function() {
-    before(function() {
-      cy.intercept({ force404: true });
-
+    beforeEach(function() {
+      cy.intercept("https://keedrop.com/api/secret", { forceNetworkError: true });
     });
 
     it("API Server not responsive", function() {
@@ -37,8 +36,8 @@ context("Create secrets", function () {
   });
 
   describe("Encrypt", function() {
-    before(function() {
-      cy.intercept("https://keedrop.com/api/secret",  { mnemo: "deadbead" }).as("postSecret");
+    beforeEach(function() {
+      cy.intercept("https://keedrop.com/api/secret", { mnemo: "deadbead" }).as("postSecret");
     });
 
     it("API server generates a secret", function() {
