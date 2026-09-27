@@ -18,6 +18,8 @@ end
 
 gem 'jekyll', '~> 4.4.0'
 gem 'erb'
+# No longer a default gem since Ruby 4.0, but required by jekyll
+gem 'logger'
 
 # Use rake as a build system
 gem 'rake'
