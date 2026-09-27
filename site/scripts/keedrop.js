@@ -34,7 +34,7 @@
     };
   }
 
-  var api = defaultAdapter("{{site.env.KEEDROP_API_PREFIX}}https://keedrop.com/api/secret");
+  var api = defaultAdapter("/api/secret");
 
   function transferEncode(value) {
     return window.nacl.util.encodeBase64(value).replace(/\//g, "!");
