@@ -141,12 +141,16 @@ input[type="text"]:focus {
   background-color: white;
 }
 
+/*
+ * Only toggle visibility so the hint keeps its space. Collapsing it on blur
+ * would move the content while the copy button is being pressed.
+ */
 .return-to-copy {
-  display: none;
+  visibility: hidden;
 }
 
 #result-box:focus ~ .return-to-copy {
-  display: block;
+  visibility: visible;
 }
 
 a.button,
