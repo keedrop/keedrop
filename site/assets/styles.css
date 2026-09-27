@@ -73,6 +73,14 @@ header .languages {
   transition: max-height 0.25s ease-out;
 }
 
+.tagline h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.1rem;
+  line-height: normal;
+}
+
 .tagline h2 {
   padding: 10% 0;
 }
@@ -108,6 +116,10 @@ nav a img {
 
 nav a {
   text-transform: lowercase;
+}
+
+.tagline h1 a {
+  color: inherit;
 }
 
 .row.content .column {
