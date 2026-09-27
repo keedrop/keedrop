@@ -68,6 +68,14 @@ jobs:
       with:
         start: bundle exec rake serve
 
+    - name: Upload Cypress screenshots
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: cypress-screenshots
+        path: cypress/screenshots
+        if-no-files-found: ignore
+
     - name: Get Go dependencies
       run: |
         go mod download
