@@ -73,9 +73,6 @@ context("Create secrets", function () {
     });
 
     it("Copy text and encrypt another should reset copy button text", function() {
-      cy.get("#secret").type("Test").should("have.value", "Test");
-      cy.contains("Encrypt").click();
-      cy.wait("@postSecret");
       // The Clipboard API rejects unless the window is focused, which headless
       // CI runs do not guarantee, so make copying deterministic
       cy.window().then(win => {
@@ -95,7 +92,13 @@ context("Create secrets", function () {
           }
         };
       });
-      cy.get("#copy").click();
+      cy.get("#secret").type("Test").should("have.value", "Test");
+      cy.contains("Encrypt").click();
+      cy.wait("@postSecret");
+      // Only click once the link is rendered and the result row has finished
+      // revealing, otherwise the click can race the result being shown
+      cy.get("#result-box").should("not.have.value", "");
+      cy.get("#copy").should("be.visible").click();
       cy.get("#copy").should("contain", "Copied!");
 
       cy.get("#secret").type("2");
