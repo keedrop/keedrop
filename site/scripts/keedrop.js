@@ -9,7 +9,9 @@
       req.open(data ? "POST" : "GET", url);
       req.onreadystatechange = function() {
         if (4 === req.readyState) {
-          if (req.status < 200 || req.status >= 400) {
+          if (req.status === 413) {
+            callback(new Error("tooLarge"), "");
+          } else if (req.status < 200 || req.status >= 400) {
             callback(new Error("sendFail"), "");
           } else {
             callback(undefined, JSON.parse(req.responseText));
@@ -34,6 +36,10 @@
     };
   }
 
+  // The server rejects request bodies over 64 KB. Encryption and base64
+  // encoding grow the secret by about a third, so cap the plain text well below.
+  var MAX_SECRET_BYTES = 46 * 1024;
+
   var api = defaultAdapter("{{site.env.KEEDROP_API_PREFIX}}https://keedrop.com/api/secret");
 
   function transferEncode(value) {
@@ -49,7 +55,8 @@
     "noSecretId": "{% t errors.noSecretId %}",
     "secretNotFound": "{% t errors.secretNotFound %}",
     "decryptionFailed": "{% t errors.decryptionFailed %}",
-    "sendFail": "{% t errors.sendFail %}"
+    "sendFail": "{% t errors.sendFail %}",
+    "tooLarge": "{% t errors.tooLarge %}"
   };
 
   function copyToClipboard(source, callback) {
@@ -116,6 +123,9 @@
 
     var form = event.currentTarget;
     var secret = window.nacl.util.decodeUTF8(document.getElementById("secret").value);
+    if (secret.length > MAX_SECRET_BYTES) {
+      return showError("tooLarge");
+    }
     var keyPair = window.nacl.box.keyPair();
     var nonce = window.nacl.randomBytes(window.nacl.box.nonceLength);
     var encrypted = window.nacl.box(secret, nonce, keyPair.publicKey, keyPair.secretKey);
@@ -134,7 +144,7 @@
     }, function(error, result) {
       button.disabled = false;
       if (error) {
-        return showError("sendFail", true);
+        return showError(error.message, error.message !== "tooLarge");
       }
       var decodeLink = location.protocol + "//" + location.host + "/r#" + result.mnemo + "_" + transferEncode(keyPair.secretKey);
       showResult(decodeLink);

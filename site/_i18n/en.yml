@@ -10,6 +10,7 @@ errors:
   secretNotFound: Could not retrieve secret. It has either expired (24h) or someone else already retrieved it.
   decryptionFailed: Could not decrypt the data.
   sendFail: Could not connect to server to store encrypted data.
+  tooLarge: The secret is too large. It can be at most 46 KB.
 headers:
   home: Transfer Secrets Securely
   imprint: KeeDrop

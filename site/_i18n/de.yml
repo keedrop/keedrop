@@ -10,6 +10,7 @@ errors:
   secretNotFound: Geheimnis konnte nicht geladen werden. Es ist entweder abgelaufen (24 Stunden) oder jemand hat es schon geladen.
   decryptionFailed: Das Geheimnis konnte nicht entschlüsselt werden.
   sendFail: Die verschlüsselten Daten konnten nicht zum Speichern übertragen werden.
+  tooLarge: Das Geheimnis ist zu groß. Es darf höchstens 46 KB groß sein.
 headers:
   imprint: KeeDrop
   decrypt: Jemand hat Ihnen ein Geheimnis geschickt
