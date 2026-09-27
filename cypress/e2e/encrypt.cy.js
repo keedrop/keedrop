@@ -35,6 +35,24 @@ context("Create secrets", function () {
     });
   });
 
+  describe("Secret size limit", function() {
+    it("Rejects a secret over 46 KB without contacting the server", function() {
+      cy.intercept("/api/secret", { mnemo: "deadbead" }).as("postSecret");
+      cy.get("#secret").invoke("val", "x".repeat(46 * 1024 + 1));
+      cy.contains("Encrypt").click();
+      cy.contains("The secret is too large");
+      cy.get("@postSecret.all").should("have.length", 0);
+    });
+
+    it("Shows the size error when the server answers 413", function() {
+      cy.intercept("/api/secret", { statusCode: 413 });
+      cy.get("#secret").type("Test");
+      cy.contains("Encrypt").click();
+      cy.contains("The secret is too large");
+      cy.get("#secret").should("be.visible");
+    });
+  });
+
   describe("Encrypt", function() {
     beforeEach(function() {
       cy.intercept("/api/secret", { mnemo: "deadbead" }).as("postSecret");
