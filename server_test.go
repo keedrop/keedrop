@@ -1,9 +1,10 @@
 package main
 
 import (
+	"bytes"
+	"github.com/gin-gonic/gin"
 	"github.com/mediocregopher/radix/v3"
 	"github.com/stretchr/testify/assert"
-	"os"
 
 	"encoding/json"
 	"net/http"
@@ -109,13 +110,11 @@ func TestCorsPreflightRequests(t *testing.T) {
 	req.Header.Set("Access-Control-Request-Method", "POST")
 	req.Header.Set("Origin", "https://keedrop.de")
 	router.ServeHTTP(recorder, req)
-	assert.Equal(t, 204, recorder.Code)
-	assert.Equal(t, "POST,GET", recorder.Header().Get("Access-Control-Allow-Methods"))
-	assert.Equal(t, "Content-Type", recorder.Header().Get("Access-Control-Allow-Headers"))
-	// no env var set, assert default
-	assert.Equal(t, "*", recorder.Header().Get("Access-Control-Allow-Origin"))
+	// no env var set: the API is same-origin only, so no CORS headers
+	assert.Empty(t, recorder.Header().Get("Access-Control-Allow-Origin"))
+	assert.Empty(t, recorder.Header().Get("Access-Control-Allow-Methods"))
 
-	os.Setenv("KEEDROP_CORS_ORIGINS", "https://keedrop.de")
+	t.Setenv("KEEDROP_CORS_ORIGINS", "https://keedrop.de")
 	router = setupRouter(redis)
 	req.Header.Set("Origin", "https://fakedomain.com")
 	recorder = httptest.NewRecorder()
@@ -126,5 +125,69 @@ func TestCorsPreflightRequests(t *testing.T) {
 	recorder = httptest.NewRecorder()
 	router.ServeHTTP(recorder, req)
 	assert.Equal(t, 204, recorder.Code)
+	assert.Equal(t, "POST,GET", recorder.Header().Get("Access-Control-Allow-Methods"))
+	assert.Equal(t, "Content-Type", recorder.Header().Get("Access-Control-Allow-Headers"))
 	assert.Equal(t, "https://keedrop.de", recorder.Header().Get("Access-Control-Allow-Origin"))
+}
+
+func postSecret(router *gin.Engine, remoteAddr string, body string) *httptest.ResponseRecorder {
+	recorder := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/api/secret", strings.NewReader(body))
+	req.RemoteAddr = remoteAddr
+	router.ServeHTTP(recorder, req)
+	return recorder
+}
+
+func TestOversizedSecretIsRejected(t *testing.T) {
+	redis := setup(t)
+	defer redis.Close()
+	router := setupRouter(redis)
+
+	hugeSecret := strings.Repeat("A", maxRequestBodyBytes)
+	body := "{\"pubkey\":\"key\",\"nonce\":\"nonce\",\"secret\":\"" + hugeSecret + "\"}"
+	recorder := postSecret(router, "192.0.2.1:1234", body)
+	assert.Equal(t, http.StatusRequestEntityTooLarge, recorder.Code)
+	assert.NotContains(t, recorder.Body.String(), "mnemo")
+}
+
+func TestApiIsRateLimitedPerClient(t *testing.T) {
+	t.Setenv("KEEDROP_RATE_LIMIT", "3")
+	redis := setup(t)
+	defer redis.Close()
+	router := setupRouter(redis)
+	const body = "{\"pubkey\":\"key\",\"nonce\":\"nonce\",\"secret\":\"secret\"}"
+
+	for i := 0; i < 3; i++ {
+		assert.Equal(t, 200, postSecret(router, "192.0.2.1:1234", body).Code)
+	}
+	assert.Equal(t, http.StatusTooManyRequests, postSecret(router, "192.0.2.1:5678", body).Code)
+
+	// a spoofed X-Forwarded-For from an untrusted client must not reset the limit
+	recorder := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/api/secret", strings.NewReader(body))
+	req.RemoteAddr = "192.0.2.1:1234"
+	req.Header.Set("X-Forwarded-For", "198.51.100.7")
+	router.ServeHTTP(recorder, req)
+	assert.Equal(t, http.StatusTooManyRequests, recorder.Code)
+
+	// other clients are not affected
+	assert.Equal(t, 200, postSecret(router, "192.0.2.2:1234", body).Code)
+}
+
+func TestRequestLogDoesNotContainMnemo(t *testing.T) {
+	var logged bytes.Buffer
+	previous := gin.DefaultWriter
+	gin.DefaultWriter = &logged
+	defer func() { gin.DefaultWriter = previous }()
+
+	redis := setup(t)
+	defer redis.Close()
+	router := setupRouter(redis)
+
+	recorder := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/api/secret/Zq7xWv3KpL", nil)
+	router.ServeHTTP(recorder, req)
+	assert.Equal(t, 404, recorder.Code)
+	assert.Contains(t, logged.String(), "/api/secret/:mnemo")
+	assert.NotContains(t, logged.String(), "Zq7xWv3KpL")
 }
