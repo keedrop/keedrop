@@ -152,3 +152,35 @@ a.button.button-outline,
 button.button-outline {
   color: #000;
 }
+
+/*
+ * Keep the header visible above the on-screen keyboard when the secret input
+ * gets focused on phones. Match on the device size, not the space left by the
+ * keyboard, since mobile browsers keep the layout viewport while it is open.
+ */
+@media (width <= 400px), (height <= 500px) {
+  header.row {
+    align-items: center;
+    background-color: #efbd47;
+  }
+
+  header .languages {
+    position: static;
+    padding-right: 1rem;
+  }
+
+  .tagline {
+    padding: 1rem 0;
+    line-height: normal;
+  }
+
+  .tagline h2 {
+    padding: 0 0 0 1rem;
+    margin: 0;
+    font-size: 2.4rem;
+  }
+
+  .row.content .column {
+    padding: 1rem 0;
+  }
+}
