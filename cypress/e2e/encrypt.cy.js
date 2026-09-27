@@ -7,6 +7,10 @@ context("Create secrets", function () {
     cy.contains("Cryptopgrahy is performed in the browser").not();
   });
 
+  it("Never serializes the secret into a native form submission", function() {
+    cy.get("#secret").should("not.have.attr", "name");
+  });
+
   describe("API Server errors", function() {
     before(function() {
       cy.intercept({ force404: true });
