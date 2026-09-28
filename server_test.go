@@ -191,3 +191,41 @@ func TestRequestLogDoesNotContainMnemo(t *testing.T) {
 	assert.Contains(t, logged.String(), "/api/secret/:mnemo")
 	assert.NotContains(t, logged.String(), "Zq7xWv3KpL")
 }
+
+func get(router *gin.Engine, path string) *httptest.ResponseRecorder {
+	recorder := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", path, nil)
+	router.ServeHTTP(recorder, req)
+	return recorder
+}
+
+func TestSecurityHeadersOnEveryResponse(t *testing.T) {
+	redis := setup(t)
+	defer redis.Close()
+	router := setupRouter(redis)
+
+	for _, path := range []string{"/", "/r", "/imprint", "/assets/keedrop.js", "/api/secret/Zq7xWv3KpL", "/does-not-exist"} {
+		header := get(router, path).Header()
+		assert.Equal(t, "max-age=31536000", header.Get("Strict-Transport-Security"), path)
+		assert.Equal(t, "nosniff", header.Get("X-Content-Type-Options"), path)
+		assert.Equal(t, "no-referrer", header.Get("Referrer-Policy"), path)
+		assert.Equal(t, "DENY", header.Get("X-Frame-Options"), path)
+		assert.Contains(t, header.Get("Permissions-Policy"), "camera=()", path)
+		csp := header.Get("Content-Security-Policy")
+		assert.Contains(t, csp, "default-src 'none'", path)
+		assert.Contains(t, csp, "script-src 'self'", path)
+		assert.Contains(t, csp, "connect-src 'self'", path)
+		assert.Contains(t, csp, "frame-ancestors 'none'", path)
+		assert.NotContains(t, csp, "unsafe-inline", path)
+	}
+}
+
+func TestApiResponsesAreNotCached(t *testing.T) {
+	redis := setup(t)
+	defer redis.Close()
+	router := setupRouter(redis)
+
+	assert.Equal(t, "no-store", get(router, "/api/secret/Zq7xWv3KpL").Header().Get("Cache-Control"))
+	assert.Equal(t, "no-store", postSecret(router, "192.0.2.1:1234", "{}").Header().Get("Cache-Control"))
+	assert.NotEqual(t, "no-store", get(router, "/").Header().Get("Cache-Control"))
+}

@@ -208,3 +208,11 @@ button.button-outline {
     padding: 1rem 0;
   }
 }
+
+/* the real submit buttons only work with JavaScript, the noscript button replaces them */
+@media (scripting: none) {
+  #encrypt,
+  #decrypt {
+    display: none;
+  }
+}

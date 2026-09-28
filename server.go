@@ -204,6 +204,29 @@ func trustedProxies() []string {
 	return []string{"127.0.0.1", "::1"}
 }
 
+// the site only loads its own scripts, styles and API, plus the badge images
+const contentSecurityPolicy = "default-src 'none'; script-src 'self'; style-src 'self'; " +
+	"img-src 'self' https://img.shields.io; connect-src 'self'; manifest-src 'self'; " +
+	"base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+
+// sets browser security headers on every response, pages and API alike
+func securityHeaders(ctx *gin.Context) {
+	header := ctx.Writer.Header()
+	header.Set("Strict-Transport-Security", "max-age=31536000")
+	header.Set("Content-Security-Policy", contentSecurityPolicy)
+	header.Set("X-Content-Type-Options", "nosniff")
+	header.Set("X-Frame-Options", "DENY")
+	header.Set("Referrer-Policy", "no-referrer")
+	header.Set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=(), usb=()")
+	ctx.Next()
+}
+
+// secrets must never end up in a browser or proxy cache
+func noStore(ctx *gin.Context) {
+	ctx.Header("Cache-Control", "no-store")
+	ctx.Next()
+}
+
 // rejects request bodies larger than maxRequestBodyBytes
 func limitRequestBody(ctx *gin.Context) {
 	ctx.Request.Body = http.MaxBytesReader(ctx.Writer, ctx.Request.Body, maxRequestBodyBytes)
@@ -230,7 +253,7 @@ func requestLogger() gin.HandlerFunc {
 
 func setupRouter(redis *radix.Pool) *gin.Engine {
 	router := gin.New()
-	router.Use(requestLogger(), gin.Recovery())
+	router.Use(requestLogger(), gin.Recovery(), securityHeaders)
 	if err := router.SetTrustedProxies(trustedProxies()); err != nil {
 		logger.Fatal("Invalid KEEDROP_TRUSTED_PROXIES:", err)
 	}
@@ -241,7 +264,7 @@ func setupRouter(redis *radix.Pool) *gin.Engine {
 		router.Use(cors.New(corsConfig()))
 	}
 
-	api := router.Group("/api")
+	api := router.Group("/api", noStore)
 	if limit := rateLimit(); limit > 0 {
 		api.Use(newRateLimiter(limit).middleware())
 	}

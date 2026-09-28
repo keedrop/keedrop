@@ -21,6 +21,7 @@ with key verification.
 - Doesn't track you with analytics
 - The API rejects request bodies over 64 KB, which leaves room for about 46 KB of secret text
 - API requests are rate-limited per IP, and neither IPs nor secret IDs are written to the request log
+- Every response carries a strict Content Security Policy, HSTS, `nosniff`, `no-referrer` and anti-framing headers, and API responses are never cached
 
 ## What it cannot defend against:
 
