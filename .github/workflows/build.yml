@@ -1,13 +1,5 @@
 name: Build
 
-env:
-  KEEDROP_CONTACT_GPGKEY: "0xdeadbead"
-  KEEDROP_CONTACT_EMAIL: thedude@dudism.church
-  KEEDROP_CONTACT_ADDRESS: Hollywood
-  KEEDROP_CONTACT_NAME: Jeffrey Lebowski
-  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-  GOFLAGS: "-mod=readonly"
-
 on:
   push:
     branches: [ master ]
@@ -16,9 +8,12 @@ on:
 
 jobs:
 
-  build:
-    name: Build
+  server:
+    name: Server
     runs-on: ubuntu-latest
+
+    env:
+      GOFLAGS: "-mod=readonly"
 
     services:
       # Label used to access the service container
@@ -36,11 +31,38 @@ jobs:
 
     steps:
 
+    - name: Check out code
+      uses: actions/checkout@v7
+
     - name: Set up Go 1.x
       uses: actions/setup-go@v7
       with:
         go-version: ^1.22
       id: go
+
+    - name: Get Go dependencies
+      run: go mod download
+
+    - name: Build server
+      run: go build -v .
+
+    - name: Test server
+      run: go test -v .
+
+  site:
+    name: Site
+    runs-on: ubuntu-latest
+
+    env:
+      KEEDROP_CONTACT_GPGKEY: "0xdeadbead"
+      KEEDROP_CONTACT_EMAIL: thedude@dudism.church
+      KEEDROP_CONTACT_ADDRESS: Hollywood
+      KEEDROP_CONTACT_NAME: Jeffrey Lebowski
+
+    steps:
+
+    - name: Check out code
+      uses: actions/checkout@v7
 
     - name: Set up Ruby 3.4
       uses: ruby/setup-ruby@v1
@@ -48,9 +70,6 @@ jobs:
         ruby-version: "3.4"
         bundler-cache: true
       id: ruby
-
-    - name: Check out code
-      uses: actions/checkout@v7
 
     - name: Set up node
       uses: actions/setup-node@v7
@@ -75,17 +94,3 @@ jobs:
         name: cypress-screenshots
         path: cypress/screenshots
         if-no-files-found: ignore
-
-    - name: Get Go dependencies
-      run: |
-        go mod download
-        if [ -f Gopkg.toml ]; then
-            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-            dep ensure
-        fi
-
-    - name: Build server
-      run: go build -v .
-
-    - name: Test server
-      run: go test -v .
