@@ -1,0 +1,31 @@
+{
+  "ci": {
+    "collect": {
+      "staticDistDir": "./_lighthouse",
+      "url": [
+        "http://localhost/index.html",
+        "http://localhost/imprint.html",
+        "http://localhost/r.html",
+        "http://localhost/de/index.html",
+        "http://localhost/de/impressum.html",
+        "http://localhost/de/r.html",
+        "http://localhost/ru/index.html",
+        "http://localhost/ru/imprint.html",
+        "http://localhost/ru/r.html"
+      ],
+      "numberOfRuns": 1
+    },
+    "assert": {
+      "assertions": {
+        "categories:performance": ["error", { "minScore": 0.9 }],
+        "categories:accessibility": ["error", { "minScore": 1 }],
+        "categories:best-practices": ["error", { "minScore": 0.9 }],
+        "categories:seo": ["error", { "minScore": 1 }]
+      }
+    },
+    "upload": {
+      "target": "filesystem",
+      "outputDir": "./.lighthouseci"
+    }
+  }
+}

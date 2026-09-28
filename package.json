@@ -10,7 +10,8 @@
     "test": "run-p cypress lint:css lint:js",
     "test:dev": "nodemon --exec npm run cypress",
     "cypress:open": "cypress open",
-    "cypress": "wait-for-localhost 4000 && cypress run"
+    "cypress": "wait-for-localhost 4000 && cypress run",
+    "lighthouse": "lhci autorun"
   },
   "repository": "keedrop/keedrop",
   "keywords": [
@@ -25,6 +26,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.39.1",
+    "@lhci/cli": "0.15.1",
     "@linthtml/linthtml": "^0.10.2",
     "axe-core": "4.13.0",
     "cypress": "^15.8.1",
