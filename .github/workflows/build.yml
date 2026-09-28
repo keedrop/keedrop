@@ -1,5 +1,11 @@
 name: Build
 
+env:
+  KEEDROP_CONTACT_GPGKEY: "0xdeadbead"
+  KEEDROP_CONTACT_EMAIL: thedude@dudism.church
+  KEEDROP_CONTACT_ADDRESS: Hollywood
+  KEEDROP_CONTACT_NAME: Jeffrey Lebowski
+
 on:
   push:
     branches: [ master ]
@@ -40,6 +46,16 @@ jobs:
         go-version: ^1.22
       id: go
 
+    - name: Set up Ruby 3.4
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: "3.4"
+        bundler-cache: true
+
+    # The server tests serve pages from _site, so build the site first
+    - name: Build site
+      run: bundle exec jekyll build
+
     - name: Get Go dependencies
       run: go mod download
 
@@ -52,12 +68,6 @@ jobs:
   site:
     name: Site
     runs-on: ubuntu-latest
-
-    env:
-      KEEDROP_CONTACT_GPGKEY: "0xdeadbead"
-      KEEDROP_CONTACT_EMAIL: thedude@dudism.church
-      KEEDROP_CONTACT_ADDRESS: Hollywood
-      KEEDROP_CONTACT_NAME: Jeffrey Lebowski
 
     steps:
 
