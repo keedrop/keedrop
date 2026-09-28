@@ -15,4 +15,11 @@ context("Language relations", function () {
     cy.visit("/imprint");
     cy.get(".languages a[hreflang=de]").should("have.attr", "href").and("contains", "impressum");
   });
+
+  it("should point search engines to absolute URLs of every translation", function() {
+    cy.visit("/imprint");
+    cy.get("head link[rel=alternate][hreflang]").should("have.length", 3).each(($link) => {
+      expect($link.attr("href")).to.match(/^https?:\/\//);
+    });
+  });
 });
