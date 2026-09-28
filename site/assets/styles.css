@@ -20,6 +20,7 @@ header .languages {
   position: absolute;
   right: 10px;
   top: 0;
+  color: black;
 }
 
 .tagline {
@@ -116,6 +117,13 @@ nav a img {
 
 nav a {
   text-transform: lowercase;
+}
+
+/* Leave at least 24px of height per link so it is easy to tap. */
+footer nav a {
+  display: inline-block;
+  min-height: 24px;
+  line-height: 24px;
 }
 
 .tagline h1 a {
