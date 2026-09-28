@@ -1,4 +1,6 @@
 _site
+_lighthouse
+.lighthouseci
 public
 .sass-cache
 .jekyll-metadata

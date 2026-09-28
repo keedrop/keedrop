@@ -104,3 +104,17 @@ jobs:
         name: cypress-screenshots
         path: cypress/screenshots
         if-no-files-found: ignore
+
+    - name: Build site for Lighthouse
+      run: bundle exec jekyll build --destination _lighthouse
+
+    - name: Run Lighthouse CI
+      run: npm run lighthouse
+
+    - name: Upload Lighthouse reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: lighthouse-reports
+        path: .lighthouseci
+        if-no-files-found: ignore
