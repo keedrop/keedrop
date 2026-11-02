@@ -1,0 +1,76 @@
+schemaVersion: v0.5
+prepare:
+  steps:
+    - name: Build Static Sites
+      command: |-
+        nix-env -iA nixpkgs.ruby_3_4 nixpkgs.gcc nixpkgs.gnumake && bundle config path vendor/bundle && bundle install --jobs 4 --retry 3 && bundle exec jekyll build && cd _site && find . -type f -name '*.html' -exec sh -c '
+            ln -s "$(basename "$1")" "${1%.html}"
+        ' sh {} \;
+    - name: Build Server Binary
+      command: nix-env -iA nixpkgs.go && go mod vendor && go build -v
+test:
+  steps: []
+run:
+  valkey:
+    healthEndpoint: tcp://localhost:6379
+    plan: 101
+    replicas: 1
+    network:
+      ports:
+        - 6379
+    env: {}
+    runAsUser: 1501
+    runAsGroup: 1010
+    volumeMounts:
+      - name: _workspace
+        mountPath: /home/user/app
+        workspacePath: ""
+    image: valkey/valkey:9.1-alpine
+  api:
+    healthEndpoint: tcp://localhost:8080
+    plan: 101
+    replicas: 1
+    network:
+      ports:
+        - 8080
+    env:
+      KEEDROP_REDIS: redis://ws-server-${{ workspace.id }}-valkey.workspaces:6379
+    volumeMounts:
+      - name: _workspace
+        mountPath: /home/user/app
+        workspacePath: ""
+    steps:
+      - command: /home/user/app/keedrop
+  static-files:
+    healthEndpoint: http://localhost:3000/
+    plan: 101
+    replicas: 1
+    network:
+      ports:
+        - 3000
+    env: {}
+    runAsUser: 1501
+    runAsGroup: 1010
+    image: busybox
+    command:
+      - httpd
+      - -f
+      - -p
+      - "3000"
+      - -h
+      - /home/user/app/_site
+  cs-router:
+    type: router
+    plan: 101
+    replicaCount: 1
+    network:
+      isLandscapeGateway: true
+      paths:
+        - path: /
+          stripPath: false
+          service: static-files
+          port: 3000
+        - path: /api
+          stripPath: false
+          service: api
+          port: 8080

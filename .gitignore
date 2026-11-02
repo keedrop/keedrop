@@ -12,7 +12,7 @@ cypress/videos
 cypress/examples
 keedrop
 keedrop.exe
-vendor/bundle
+vendor/
 .bundle
 
 # Elastic Beanstalk Files
